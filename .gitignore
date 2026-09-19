@@ -1,0 +1,23 @@
+# OS Metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+
+# SQLite WAL & Journal files
+*.db-wal
+*.db-shm
+*.db-journal
+
+# Logs & temporary captures
+*.log
+*logcat*.txt
+
+# GitNexus local analyzer cache & AST store
+.gitnexus/

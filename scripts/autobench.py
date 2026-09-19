@@ -463,8 +463,8 @@ def run_geekbench_gpu_test(api="vulkan"):
                 )
                 return latest_doc
 
-        if elapsed > 480:
-            print(f"\n[!] Timeout: Geekbench 7 GPU exceeded 8 minutes.")
+        if elapsed > 900:
+            print(f"\n[!] Timeout: Geekbench 7 GPU exceeded 15 minutes.")
             return None
 
 

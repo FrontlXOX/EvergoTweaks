@@ -5,6 +5,11 @@ if [ -n "$MODPATH" ]; then
   SKIPUNZIP=1
   unzip -o "$ZIPFILE" -x 'META-INF/*' -d "$MODPATH" >&2
   set_perm_recursive "$MODPATH" 0 0 0755 0644
+  set_perm "$MODPATH/post-fs-data.sh" 0 0 0755
+  chcon -R u:object_r:same_process_hal_file:s0 "$MODPATH/system/vendor/lib" 2>/dev/null
+  chcon -R u:object_r:same_process_hal_file:s0 "$MODPATH/system/vendor/lib64" 2>/dev/null
+  chcon -R u:object_r:same_process_hal_file:s0 "$MODPATH/system/vendor/etc/mali_platform.config" 2>/dev/null
+  chcon -R u:object_r:vendor_configs_file:s0 "$MODPATH/system/vendor/etc/permissions" 2>/dev/null
   exit 0
 fi
 

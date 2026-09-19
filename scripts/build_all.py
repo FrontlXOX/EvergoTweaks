@@ -524,7 +524,7 @@ def main():
     any_flag = args.memory or args.thermal or args.vulkan
     build_mem = args.memory if any_flag else True
     build_therm = args.thermal if any_flag else True
-    build_vulk = args.vulkan if any_flag else False
+    build_vulk = args.vulkan if any_flag else True
 
     mem_zip = os.path.join(
         REPO_ROOT, "package", "MemoryMgmt", "package", "MemoryMgmt.zip"

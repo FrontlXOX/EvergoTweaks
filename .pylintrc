@@ -1,0 +1,10 @@
+[MAIN]
+ignore=.git,__pycache__
+
+[MESSAGES CONTROL]
+disable=all
+
+[REPORTS]
+output-format=text
+reports=no
+score=no

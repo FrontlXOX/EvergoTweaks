@@ -1,0 +1,14 @@
+[tool.ruff]
+ignore = ["ALL"]
+select = []
+
+[tool.flake8]
+ignore = ["E", "F", "W", "C", "N", "D"]
+
+[tool.pylint.messages_control]
+disable = "all"
+
+[tool.pyright]
+reportMissingImports = false
+reportGeneralTypeIssues = false
+reportOptionalMemberAccess = false

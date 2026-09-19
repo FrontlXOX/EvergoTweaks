@@ -1,7 +1,4 @@
 # Everpal Vulkan 1.3 System Properties
 ro.hardware.vulkan=mali
-persist.sys.graphics.renderapi=vulkan
-debug.renderengine.backend=vulkan
-debug.hwui.renderer=skiagl
-ro.opengles.version=196610
 ro.hardware.egl=mali
+ro.opengles.version=196610

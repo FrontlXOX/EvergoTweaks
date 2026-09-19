@@ -1,4 +1,13 @@
 #!/sbin/sh
+# If invoked by KernelSU / Magisk / APatch Manager:
+if [ -n "$MODPATH" ]; then
+  umask 022
+  SKIPUNZIP=1
+  unzip -o "$ZIPFILE" -x 'META-INF/*' -d "$MODPATH" >&2
+  set_perm_recursive "$MODPATH" 0 0 0755 0644
+  exit 0
+fi
+
 # AnyKernel3 Backend (DO NOT CHANGE)
 # osm0sis @ xda-developers
 

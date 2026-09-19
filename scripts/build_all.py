@@ -508,6 +508,9 @@ def main():
         "--thermal", "-t", action="store_true", help="Build ThermalMgmt.zip only"
     )
     parser.add_argument(
+        "--vulkan", "-v", action="store_true", help="Build Vulkan13-KernelSU.zip only"
+    )
+    parser.add_argument(
         "--verify-only",
         action="store_true",
         help="Verify existing packages without rebuilding",
@@ -518,12 +521,10 @@ def main():
     print(" EvergoTweaks Unified Module Builder & Validator")
     print("=" * 60)
 
-    build_mem = True
-    build_therm = True
-    if args.memory and not args.thermal:
-        build_therm = False
-    elif args.thermal and not args.memory:
-        build_mem = False
+    any_flag = args.memory or args.thermal or args.vulkan
+    build_mem = args.memory if any_flag else True
+    build_therm = args.thermal if any_flag else True
+    build_vulk = args.vulkan if any_flag else False
 
     mem_zip = os.path.join(
         REPO_ROOT, "package", "MemoryMgmt", "package", "MemoryMgmt.zip"
@@ -531,14 +532,26 @@ def main():
     therm_zip = os.path.join(
         REPO_ROOT, "package", "ThermalMgmt", "package", "ThermalMgmt.zip"
     )
+    vulk_zip = os.path.join(
+        REPO_ROOT, "package", "Vulkan13", "package", "Vulkan13-KernelSU.zip"
+    )
 
     if not args.verify_only:
+        step = 1
+        total_steps = sum([build_mem, build_therm, build_vulk])
         if build_mem:
-            print("\n[1/2] Building MemoryMgmt.zip...")
+            print(f"\n[{step}/{total_steps}] Building MemoryMgmt.zip...")
             build_memory_module(REPO_ROOT)
+            step += 1
         if build_therm:
-            print("\n[2/2] Building ThermalMgmt.zip...")
+            print(f"\n[{step}/{total_steps}] Building ThermalMgmt.zip...")
             build_thermal_module(REPO_ROOT)
+            step += 1
+        if build_vulk:
+            print(f"\n[{step}/{total_steps}] Building Vulkan13-KernelSU.zip...")
+            from build_vulkan13 import build_vulkan13_package
+            build_vulkan13_package(REPO_ROOT)
+            step += 1
 
     print("\n" + "=" * 60)
     print(" Verifying Packages (CRC-32 & Structure)")
@@ -571,6 +584,11 @@ def main():
             ],
         )
         all_ok = all_ok and therm_ok
+
+    if build_vulk:
+        from build_vulkan13 import verify_package as verify_vulkan_pkg
+        vulk_ok = verify_vulkan_pkg(vulk_zip)
+        all_ok = all_ok and vulk_ok
 
     if not all_ok:
         sys.exit(1)

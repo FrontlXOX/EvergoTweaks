@@ -1,0 +1,20 @@
+[submodule "trees/device_xiaomi_everpal"]
+	path = trees/device_xiaomi_everpal
+	url = https://github.com/Addster09/device_xiaomi_everpal.git
+	branch = lineage-23.2
+	ignore = dirty
+[submodule "trees/kernel"]
+	path = trees/kernel
+	url = https://github.com/Addster09/android_kernel_xiaomi_mt6833.git
+	branch = lineage-24.0
+	ignore = dirty
+[submodule "trees/upstream-device"]
+	path = trees/upstream-device
+	url = https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal.git
+	branch = lineage-23.2
+	ignore = dirty
+[submodule "trees/vendor_xiaomi_everpal"]
+	path = trees/vendor_xiaomi_everpal
+	url = https://github.com/xiaomi-mt6833-dev/vendor_xiaomi_everpal.git
+	branch = lineage-23.2
+	ignore = dirty

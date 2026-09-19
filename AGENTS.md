@@ -174,7 +174,7 @@ EvergoTweaks/
     │   └── docs/                      # Architectural blueprint & integration guide
     │       └── memory-mgmt.txt        # Master blueprint, LMKD tuning logic & git diffs
     │
-    └── ThermalMgmt/                   # 🔥 Thermal Mitigation & mi_thermald Subsystem
+    ├── ThermalMgmt/                   # 🔥 Thermal Mitigation & mi_thermald Subsystem
         ├── README.md                  # Hardware audit, decrypted Xiaomi profiles & profile tables
         ├── patch.patch                # Unified diff for device and vendor trees
         ├── package/
@@ -184,6 +184,12 @@ EvergoTweaks/
             ├── history.db                # Raw SQLite database pulled from Geekbench 7
             ├── thermal-mgmt.txt          # Master thermal analysis & register teardown
             └── vendor_configs/           # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
+    │
+    └── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
+        ├── README.md                  # Hardware audit, linker hooks & benchmark records
+        ├── package/
+        │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: TesterProd)
+        └── template/                  # Hybrid ICD stack, companion libraries & SELinux scripts
 ```
 
 ---
@@ -192,7 +198,7 @@ EvergoTweaks/
 
 ### Building Flashable Modules (Unified & Reproducible)
 
-To rebuild both KernelSU/Magisk modules and verify their zip integrity:
+To rebuild all KernelSU/Magisk modules and verify their zip integrity:
 
 ```bash
 python scripts/build_all.py
@@ -203,6 +209,7 @@ Or rebuild individual modules:
 ```bash
 python scripts/build_all.py --memory
 python scripts/build_all.py --thermal
+python scripts/build_all.py --vulkan
 ```
 
 *Note: Flashable zips are always written exclusively to `package/<Module>/package/`.*

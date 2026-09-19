@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [v1.1.0] - 2026-09-20
+
+### 🏆 Milestone Achievements
+
+- **ARM Mali-G57 Vulkan 1.3 Hybrid Engine Deployed & Verified:**
+  - Successfully decoupled Vulkan 1.3 runtime from the legacy Linux 4.14 split-driver kernel trap, preserving stock `libGLES_mali.so` for SurfaceFlinger while providing a pure Valhall r49p1 Vulkan 1.3 ICD (`libVK13_mali.so`) for games and compute workloads.
+  - **Dynamic Linker Resolution Fixes:**
+    - Resolved missing `GpuAuxBlitAHardwareBuffer` via in-place symbol export patch in companion library `libgpd1.so`.
+    - Resolved missing frame rate watchdog symbols (`ged_fr_swd_frame_destroy` and `ged_fr_swd_mark_frame`) by integrating the HyperOS 2.0 donor `libged.so` superset.
+  - **Android 16 Framework Recognition:** Verified via `dumpsys gpu` with `vulkanVersion = 4206592` (0x00403000 = Vulkan 1.3.0), `createdVulkanDevice = 1`, and `vkLoadingFailureCount = 0`.
+- **All-Time Global MT6833 3DMark Sling Shot Extreme Record: `2,736` pts!**
+  - Established a new all-time global benchmark record of **`2,736 pts`** (+8.7% over stock baseline, beating the previous 2,698 record).
+  - **Graphics Score:** **`2,557 pts`** (Peak GT1: **17.30 FPS**, GT2: **8.19 FPS**).
+  - **Physics Score:** Smashed the physics ceiling under Vulkan with **`4,053 pts`** (+20.0% / +674 pts over stock).
+- **Unified Automation & Module Packaging:**
+  - Enhanced [`scripts/build_all.py`](file:///D:/Evergo/EvergoTweaks/scripts/build_all.py) to build and CRC-32 verify all 3 flashable modules (`MemoryMgmt.zip`, `ThermalMgmt.zip`, `Vulkan13-KernelSU.zip`) simultaneously.
+
+---
+
 ## [v1] - 2026-09-19
 
 ### 🏆 Milestone Achievements

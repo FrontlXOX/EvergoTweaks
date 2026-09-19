@@ -16,6 +16,7 @@
 | **Geekbench 7 Single-Core** | [![Geekbench 7 Single-Core](https://img.shields.io/badge/Single--Core-729_(Record)-brightgreen?style=for-the-badge&logo=speedtest&logoColor=white)](https://browser.geekbench.com/v7/cpu/391841) | **`729` SC**<br>`+19.5%` (+119 pts) | 2.40 GHz Cortex-A76 Big core • DVFSRC 4.266 GHz LPDDR4X • 0 µs Schedutil ramp |
 | **Geekbench 7 Multi-Core** | [![Geekbench 7 Multi-Core](https://img.shields.io/badge/Multi--Core-2133_(Record)-brightgreen?style=for-the-badge&logo=speedtest&logoColor=white)](https://browser.geekbench.com/v7/cpu/400164) | **`2,133` MC**<br>`+42.2%` (+633 pts) | 8 Cores (2x A76 + 6x A55) • CoreLink CCI 1.60 GHz • 55°C NoLimits headroom |
 | **CPU Official Compare** | [![Geekbench 7 CPU Compare](https://img.shields.io/badge/CPU_Comparison-Verified_vs_Stock-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://browser.geekbench.com/v7/cpu/compare/400164?baseline=380539) | **Run 400164**<br>vs Run 380539 | Verified side-by-side CPU proof against pure stock baseline (+42.2% Multi-Core) |
+| **3DMark Sling Shot Extreme** | [![3DMark Record](https://img.shields.io/badge/3DMark-2736_(Record)-red?style=for-the-badge&logo=gamedeveloper&logoColor=white)](https://gitlab.com/ShovitDutta1/EvergoTweaks) | **`2,736` pts**<br>`+8.7%` Boost | Mali-G57 @ 1068 MHz • 2557 Graphics (GT1: 17.3 FPS) • 4053 Vulkan Physics |
 | **Geekbench 7 GPU (Compute)** | [![Geekbench 7 GPU](https://img.shields.io/badge/GPU_Compute-1302_(Record)-orange?style=for-the-badge&logo=arm&logoColor=white)](https://browser.geekbench.com/v7/gpu/183548) | **`1,302` pts**<br>`+20.6%` Boost | ARM Mali-G57 MC2 @ 1068 MHz GED boost • 50ms DVFS lock • OpenCL Compute |
 | **GPU Official Compare** | [![Geekbench 7 GPU Compare](https://img.shields.io/badge/GPU_Comparison-Verified_Run-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://browser.geekbench.com/v7/gpu/compare/183548?baseline=183548) | **Run 183548**<br>Compute Audit | Official side-by-side Geekbench 7 GPU sub-workload analysis & verification |
 
@@ -35,9 +36,11 @@ Tested live on real hardware with deep kernel diagnostics, this repository provi
 | :---------------------------- | :-------------: | :---------------------: | :----------------------------------------: | :------------------------------------------------------------- |
 | **Geekbench 7 Multi-Core**    |     `1,500`     |         `1,788`         |                **`2,133`**                 | 🚀 **+42.2% (+633 pts — Global MT6833 Record!)**               |
 | **Geekbench 7 Single-Core**   |      `610`      |          `578`          |                 **`729`**                  | 🚀 **+19.5% (+119 pts — New Global MT6833 Record!)**           |
-| **Geekbench 7 GPU (Compute)** |    ~`1,080`     |         —          |                **`1,302`**                 | 🚀 **+20.6% (Mali-G57 MC2 @ 1068 MHz GED Boost)**              |
-| **Direct Reclaim Stalls**     |    ⚠️ Severe    |      🛡️ None       |   🛡️ **Zero Allocation Stalls**    | Smooth UI and hitch-free multi-tasking                         |
-| **Background App Retention**  | ❌ Murders all  | ✅ 100% kept alive |       ✅ **100% Kept Alive**       | Retains launcher, music player & browser in ZRAM               |
+| **3DMark Sling Shot Extreme** |     `2,518`     |            —            |                **`2,736`**                 | 🚀 **+8.7% (+218 pts — All-Time MT6833 Record!)**              |
+| **3DMark Physics (Vulkan)**   |     `3,379`     |            —            |                **`4,053`**                 | 🚀 **+20.0% (+674 pts — World Record Physics Run!)**           |
+| **Geekbench 7 GPU (Compute)** |    ~`1,080`     |         —               |                **`1,302`**                 | 🚀 **+20.6% (Mali-G57 MC2 @ 1068 MHz GED Boost)**              |
+| **Direct Reclaim Stalls**     |    ⚠️ Severe    |      🛡️ None            |   🛡️ **Zero Allocation Stalls**             | Smooth UI and hitch-free multi-tasking                         |
+| **Background App Retention**  | ❌ Murders all  | ✅ 100% kept alive      |       ✅ **100% Kept Alive**                | Retains launcher, music player & browser in ZRAM               |
 
 <details>
 <summary><b>🔬 Tap to view full Single-Core (16 tests) & Multi-Core (8 tests) sub-workload telemetry</b></summary>
@@ -148,7 +151,7 @@ EvergoTweaks/
     │   └── docs/                      # Architectural blueprint & integration guide
     │       └── memory-mgmt.txt        # Master blueprint, LMKD tuning logic & zone math
     │
-    └── ThermalMgmt/                   # 🔥 Thermal Mitigation & mi_thermald Architecture
+    ├── ThermalMgmt/                   # 🔥 Thermal Mitigation & mi_thermald Architecture
         ├── README.md                  # Hardware audit & decrypted Xiaomi AES configuration breakdown
         ├── patch.patch                # Unified git patch for device & vendor trees
         ├── package/
@@ -158,6 +161,12 @@ EvergoTweaks/
             ├── history.db             # Raw SQLite database pulled from Geekbench 7
             ├── thermal-mgmt.txt       # Master thermal analysis & register teardown
             └── vendor_configs/        # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
+    │
+    └── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
+        ├── README.md                  # Architecture, linker hooks & benchmark audit
+        ├── package/
+        │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: TesterProd)
+        └── template/                  # Hybrid ICD stack, companion libraries & SELinux scripts
 ```
 
 </details>
@@ -205,6 +214,26 @@ Custom ROMs suffered from severe thermal downclocking due to missing Xiaomi prop
 
 ---
 
+## 🎮 3. Vulkan 1.3 Subsystem (`package/Vulkan13/`)
+
+<details>
+<summary><b>🎮 Tap to expand Vulkan 1.3 Hybrid Engine, Linker Hooks & Benchmark Records</b></summary>
+<br>
+
+Custom ROMs on MediaTek MT6833 suffered from outdated Vulkan 1.1 graphics stacks, missing Vulkan 1.3 extensions (`VK_KHR_dynamic_rendering`, `VK_KHR_synchronization2`), and fatal bootloops when attempting naive user-space driver updates:
+
+- **The Problem:** ARM Mali GPUs use a version-locked user/kernel split-driver architecture. Replacing `libGLES_mali.so` with newer DDKs causes SurfaceFlinger to crash on Linux 4.14 kernel drivers due to mismatched IOCTL command structures.
+- **The Solution:**
+  - **Dual-Stack Decoupling:** Keeps stock `libGLES_mali.so` for SurfaceFlinger stability while deploying a dedicated **Valhall r49p1 Vulkan 1.3 ICD** (`libVK13_mali.so`) and HAL stub (`vulkan.mali.so`).
+  - **Dynamic Linker Hooks:** Patched companion library `libgpd1.so` to export missing `GpuAuxBlitAHardwareBuffer`, and integrated the HyperOS 2.0 donor `libged.so` runtime to resolve `ged_fr_swd_frame_destroy` and `ged_fr_swd_mark_frame`.
+  - **Verified Recognition:** Android 16 reports `vulkanVersion = 4206592` (Vulkan 1.3.0) with zero driver loading failures (`createdVulkanDevice = 1`).
+  - **Benchmark Records:** Delivered all-time MT6833 records in **3DMark Sling Shot Extreme** (**2,736 pts overall**, **4,053 Vulkan physics**).
+- **Details & Package:** See [`package/Vulkan13/README.md`](./package/Vulkan13/README.md) and [`package/Vulkan13/package/Vulkan13-KernelSU.zip`](./package/Vulkan13/package/Vulkan13-KernelSU.zip).
+
+</details>
+
+---
+
 ## 🛠️ How to Use
 
 <details>
@@ -217,7 +246,8 @@ For instant live testing without recompiling ROM images:
 
 1. Flash [`package/MemoryMgmt/package/MemoryMgmt.zip`](./package/MemoryMgmt/package/MemoryMgmt.zip) via your root manager.
 2. Flash [`package/ThermalMgmt/package/ThermalMgmt.zip`](./package/ThermalMgmt/package/ThermalMgmt.zip) via your root manager.
-3. Reboot to activate full 2.4 GHz clocks, 55°C thermal headroom, and 3.58 GB LZ4 ZRAM.
+3. Flash [`package/Vulkan13/package/Vulkan13-KernelSU.zip`](./package/Vulkan13/package/Vulkan13-KernelSU.zip) via your root manager.
+4. Reboot to activate full 2.4 GHz clocks, 55°C thermal headroom, 3.58 GB LZ4 ZRAM, and Vulkan 1.3 graphics.
 
 ### Method 2: ROM Integration (Device & Vendor Trees)
 

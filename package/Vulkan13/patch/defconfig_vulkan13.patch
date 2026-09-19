@@ -1,0 +1,8 @@
+--- a/arch/arm64/configs/everpal_defconfig
++++ b/arch/arm64/configs/everpal_defconfig
+@@ -221,4 +221,4 @@ CONFIG_MTK_COMBO_CHIP_CONSYS_6833=y
+ CONFIG_DRM_PANEL_XIAOMI_EVERPAL=y
+ CONFIG_DRM_PANEL_XIAOMI_EVERPAL_TIANMA=y
+ CONFIG_DRM_PANEL_XIAOMI_EVERPAL_CSOT=y
+-CONFIG_MTK_GPU_VERSION="mali valhall r32p1"
++CONFIG_MTK_GPU_VERSION="mali valhall r44p0"

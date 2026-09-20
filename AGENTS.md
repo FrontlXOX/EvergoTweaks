@@ -13,7 +13,7 @@
 
 **EverpalTweaks** is an empirically audited, hardware-verified optimization suite developed to resolve custom ROM performance degradation, thermal throttling, and aggressive background process termination on the Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal`).
 
-This repository maintains two production-grade subsystems:
+This repository maintains four production-grade subsystems:
 
 1. **`MemoryMgmt/`** — Resolves MT6833 `Zone Normal` memory exhaustion, tunes Android 16 LMKD watermarks, and scales ZRAM to 3.58 GB LZ4 for zero direct reclaim stalls and 100% background app retention.
 2. **`ThermalMgmt/`** — Decrypts Xiaomi OpenSSL AES-128-CBC thermal profiles, decouples thermal regulation from missing proprietary `joyose`, maps `sconfig 10` (NoLimits profile with 55°C headroom), and uncaps Cortex-A76 Big cores (2.4 GHz) and Mali-G57 GPU clocks.
@@ -192,26 +192,30 @@ EverpalTweaks/
     │   ├── autobench.py               # Automated Geekbench 7 (CPU + GPU Vulkan) suite with real-time CLI telemetry
     │   ├── benchpull.py               # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
     │   ├── build_kernel.sh            # ZorinOS integrated builder: Aqua kernel + optional Vulkan 1.3 overlay combo zip
-    │   ├── builder.py                 # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan, --spatial)
+    │   ├── builder.py                 # Unified master module packager & CRC-32 validator (--all, --memory/-m, --thermal/-t, --vulkan/-v, --spatial/-s, --kernel/-k, --dtbo/-d, --blobs/-b)
+    │   ├── decouple_libge2.py         # Vulkan 1.3 one-shot binary patch: DT_NEEDED libged.so -> libge2.so
     │   ├── decrypt_thermal.py         # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
+    │   ├── dumpboot.py                # ROM boot.img extractor (boot.img direct or payload.bin)
     │   ├── synctrees.py               # Automated tree synchronizer for GitHub (FrontlXOX)
     │   └── verifydevice.py            # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
     │
     ├── trees/                         # 🌲 Submodule Forks on GitHub (FrontlXOX)
     │   ├── device_xiaomi_everpal/     # FrontlXOX device tree (lineage-23.2)
     │   ├── kernel/                    # FrontlXOX Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
-    │   ├── kernel-5.10/               # MediaTek 5.10 GKI donor kernel (vic, mt6789/mt6833 sibling)
-    │   ├── upstream-device/           # xiaomi-mt6833-dev reference tree (vulkan-1.3)
-    │   └── vendor_xiaomi_everpal/     # FrontlXOX vendor blobs (vulkan-1.3, lineage-23.2)
+    │   ├── kernel-5.10/               # MillenniumOSS MT6789-common donor kernel (vic branch, mt6789/mt6833 sibling)
+    │   ├── upstream-device/           # xiaomi-mt6833-dev reference tree (lineage-23.2)
+    │   └── vendor_xiaomi_everpal/     # FrontlXOX vendor blobs (lineage-23.2)
     │
     ├── modules/                       # 📲 Third-Party Companion Modules (Sanctioned Rule 4 Exception)
-    │   ├── *.zip                      # Curated flashable companions (ZygiskNext, LSPosed, ViPER, HideNavBar, etc.)
+    │   ├── *.zip                      # Curated flashable companions (numbered: MagicMountRS, ZygiskNext, ZygiskAssistant, Detach, LSPosed, ReMalwack, HideNavBar, GSFCertFix)
+    │   ├── Kaeru/                     # Kaeru flash tooling (flash.sh + version-9/10.bin)
     │   └── ResukiSU/                  # ReSukiSU repack tooling (main.py + python/ avb/mkbootimg helpers)
     │
     └── package/                       # 📦 Flashable Subsystems & Packaging Assets
         ├── templates/                 # Shared Magisk, KernelSU & AnyKernel3 packaging templates
         │   ├── AnyKernel3/            # Base AnyKernel3 flashable zip packaging assets
         │   ├── META-INF/              # Generic Magisk update-binary stubs
+        │   ├── SpatialAudio/          # Spatial Audio configuration overlays
         │   └── Vulkan13/              # Hybrid ICD stack, companion libraries & SELinux scripts
         │
         ├── MemoryMgmt/                # 🧠 RAM & LMKD Architecture Subsystem
@@ -272,6 +276,8 @@ python src/scripts/builder.py --spatial
 ```
 
 _Note: Flashable zips are always written exclusively to `src/package/<Module>/package/`._
+
+Short flags `--memory/-m`, `--thermal/-t`, `--vulkan/-v`, `--spatial/-s` are also accepted. Vulkan-only kernel injection (without a full kernel build): `python src/scripts/builder.py --vulkan --kernel path/to/Image.gz --dtbo path/to/dtbo.img` plus optional `--blobs <dir>`.
 
 ### Building the Aqua Kernel (ZorinOS / Ubuntu)
 
@@ -427,14 +433,14 @@ All agents working within this codebase must strictly observe these rules:
 3. 🛑 **No Backlight Tampering:** NEVER alter `mtk-cl-backlight` cooling levels in thermal configs. Doing so forces PWM brightness to 0, causing permanent black screens on lock/unlock.
 4. 🛑 **Zip Placement Boundary:** Builder-produced EverpalTweaks flashable `.zip` archives must reside **exclusively** inside their respective `src/package/` directories (`src/package/MemoryMgmt/package/`, `src/package/ThermalMgmt/package/`, `src/package/Vulkan13/package/`, and `src/package/SpatialAudio/package/`). The sole sanctioned exception is the curated root `src/modules/` third-party companion collection (root/LSPosed/Zygisk/ReSukiSU tooling flashed alongside EverpalTweaks). Never place `.zip` files elsewhere in the repository root or script directories.
 5. 🛑 **Scripts Centralization Boundary:** All required Python automation, build, extraction, and verification scripts must reside **exclusively** in the root `src/scripts/` folder. Do not create or reintroduce scripts inside `package/*/scripts/`. The sole sanctioned exception is the third-party `src/modules/ResukiSU/` repack tooling (`main.py` + `python/` helpers), which ships verbatim as part of that companion module.
-6. 🛑 **No Secrets or Bloat:** Never commit `.env` files, API tokens, local OS metadata (`.DS_Store`, `Thumbs.db`), Python caches (`__pycache__`), or SQLite WAL journal files.
+6. 🛑 **No Secrets or Bloat:** Never commit `.env` files, API tokens, local OS metadata (`.DS_Store`, `Thumbs.db`), Python caches (`__pycache__`), SQLite WAL journal files, or session transcripts / raw JSONL logs (`src/docs/`, `SESSION_TRANSCRIPT.md`, `transcript_archive.jsonl.gz`). Engineering session history must not be committed to the repo.
 7. 🛑 **Attribution Integrity:**
    - Magisk / KernelSU modules must maintain `author=FrontlXOX` strictly inside `module.prop`.
    - General project authorship and maintainership belongs to `Author & Maintainer: Shovit Dutta`.
    - Architectural and research credits honor: `Special Thanks & Collaborators: Addster09 x himanshuksr0007 (Goku)`.
    - Under NO circumstances should `FrontlXOX` be listed under Authors & Credits in documentation (project authorship belongs to Shovit Dutta).
 8. 🔄 **Benchmark URL Maintenance:** Whenever a new peak record run is achieved, always update the official side-by-side comparison URL (`https://browser.geekbench.com/v7/cpu/compare/<NEW_RECORD_ID>?baseline=380539`) across all documentation markdown files (`README.md`, `AGENTS.md`, `src/package/ThermalMgmt/README.md`).
-9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\Evergo\EverpalTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
+9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\EverpalTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
 10. 🐙 **GitHub Primacy (FrontlXOX):** All project hosting, trees, forks, releases, and collaborator cherry-picks reside exclusively on **GitHub** under `https://github.com/FrontlXOX/` (`EverpalTweaks`, `device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`). GitLab has been completely deprecated per user directive.
 11. 🌲 **Submodule GitHub Tracking:** All submodules in `src/trees/` track their respective GitHub forks under `FrontlXOX` as remote `origin`. Upstream synchronization (`src/scripts/synctrees.py`) pushes directly to `origin` on GitHub.
 12. 🤖 **Sub-Agent First Policy:** Before the parent agent makes any direct code edits, file writes, or tree modifications for non-trivial tasks, it MUST first delegate discovery, auditing, and research to specialized sub-agents. The parent agent acts as orchestrator — it reads sub-agent findings, synthesizes them, then and only then executes targeted changes. Direct parent-agent edits without prior sub-agent research are only acceptable for single-line fixes, typo corrections, or trivially scoped changes confirmed at a glance.

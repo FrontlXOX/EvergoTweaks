@@ -21,7 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - **Modern Extension Support:** **`VK_KHR_dynamic_rendering`** (PASSED) and **`VK_KHR_push_descriptor`** (PASSED).
   - **VulkanMod (Minecraft / Pojav):** **`100% PASSED`**.
 - **Master Archival Documentation:**
-  - Generated complete session engineering transcript ([`docs/SESSION_TRANSCRIPT.md`](file:///D:/Evergo/EverpalTweaks/docs/SESSION_TRANSCRIPT.md)) and compressed binary log archive ([`docs/transcript_archive.jsonl.gz`](file:///D:/Evergo/EverpalTweaks/docs/transcript_archive.jsonl.gz)).
+  - Session engineering transcript (`src/docs/SESSION_TRANSCRIPT.md`) and compressed log archive (`src/docs/transcript_archive.jsonl.gz`) have been removed from the repo per bloat guardrail (see AGENTS.md Rule 6).
 
 ---
 

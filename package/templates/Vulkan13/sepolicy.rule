@@ -1,0 +1,19 @@
+# SurfaceFlinger vendor library access on overlay / tmpfs
+allow surfaceflinger vendor_file file { read open getattr execute map }
+allow surfaceflinger same_process_hal_file file { read open getattr execute map }
+allow surfaceflinger vendor_configs_file file { read open getattr }
+allow surfaceflinger vendor_configs_file dir { search read open }
+allow surfaceflinger labeledfs filesystem { associate }
+
+# Appdomain rendering and compute access
+allow appdomain vendor_file file { read open getattr execute map }
+allow appdomain same_process_hal_file file { read open getattr execute map }
+allow appdomain vendor_configs_file file { read open getattr }
+allow appdomain vendor_configs_file dir { search read open }
+
+# System server & graphics HALs
+allow system_server vendor_file file { read open getattr execute map }
+allow hal_graphics_allocator_default vendor_file file { read open getattr execute map }
+allow hal_graphics_allocator_default same_process_hal_file file { read open getattr execute map }
+allow hal_graphics_composer_default vendor_file file { read open getattr execute map }
+allow hal_graphics_composer_default same_process_hal_file file { read open getattr execute map }

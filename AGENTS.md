@@ -167,20 +167,22 @@ EvergoTweaks/
 │
 ├── scripts/                           # 🛠️ Centralized Repository Automation Tooling (Root-Only)
 │   ├── autobench.py                   # Automated Geekbench 7 (CPU + GPU Vulkan) suite with real-time CLI telemetry
-│   ├── build_all.py                   # Unified module packager & CRC-32 validator (--memory, --thermal)
+│   ├── benchpull.py                   # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
+│   ├── builder.py                     # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan)
 │   ├── decrypt_thermal.py             # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
-│   ├── pull_benchmark.py              # Automated ADB extractor for Geekbench 7 CPU & GPU SQLite DB
-│   └── verify_device.py               # Live ADB hardware & kernel parameter audit CLI
+│   └── verifydevice.py                # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
 │
-├── trees/                             # 🌲 Upstream Git Submodules (Reference trees)
-│   ├── device_xiaomi_everpal/         # Addster09/device_xiaomi_everpal (lineage-23.2)
-│   ├── kernel/                        # Addster09/android_kernel_xiaomi_mt6833 (lineage-24.0)
-│   ├── upstream-device/               # xiaomi-mt6833-dev/device_xiaomi_everpal (lineage-23.2)
-│   └── vendor_xiaomi_everpal/         # xiaomi-mt6833-dev/vendor_xiaomi_everpal (lineage-23.2)
+├── trees/                             # 🌲 Dual-Remote Git Submodules (Upstream GitHub + GitLab Forks)
+│   ├── device_xiaomi_everpal/         # Addster09 / ShovitDutta1 device tree (lineage-23.2)
+│   ├── kernel/                        # Addster09 / ShovitDutta1 Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
+│   ├── upstream-device/               # xiaomi-mt6833-dev / ShovitDutta1 reference tree (vulkan-1.3)
+│   └── vendor_xiaomi_everpal/         # xiaomi-mt6833-dev / ShovitDutta1 vendor blobs (vulkan-1.3)
 │
 └── package/                           # 📦 Flashable Subsystems & Packaging Assets
-    ├── templates/                     # Shared Magisk/KernelSU installer templates
-    │   └── META-INF/com/google/android/ # Vendored update-binary & updater-script stubs
+    ├── templates/                     # Shared Magisk, KernelSU & AnyKernel3 packaging templates
+    │   ├── AnyKernel3/                # Base AnyKernel3 flashable zip packaging assets
+    │   ├── META-INF/                  # Generic Magisk update-binary stubs
+    │   └── Vulkan13/                  # Hybrid ICD stack, companion libraries & SELinux scripts
     │
     ├── MemoryMgmt/                    # 🧠 RAM & LMKD Architecture Subsystem
     │   ├── README.md                  # Comprehensive technical manual & QA zone math audit
@@ -191,21 +193,24 @@ EvergoTweaks/
     │       └── memory-mgmt.txt        # Master blueprint, LMKD tuning logic & git diffs
     │
     ├── ThermalMgmt/                   # 🔥 Thermal Mitigation & mi_thermald Subsystem
-        ├── README.md                  # Hardware audit, decrypted Xiaomi profiles & profile tables
-        ├── patch.patch                # Unified diff for device and vendor trees
-        ├── package/
-        │   └── ThermalMgmt.zip        # Flashable module (Author: TesterProd)
-        └── docs/                      # Benchmark logs, databases & vendor configs
-            ├── benchmark_history.txt     # Chronological benchmark log
-            ├── history.db                # Raw SQLite database pulled from Geekbench 7
-            ├── thermal-mgmt.txt          # Master thermal analysis & register teardown
-            └── vendor_configs/           # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
+    │   ├── README.md                  # Hardware audit, decrypted Xiaomi profiles & profile tables
+    │   ├── patch.patch                # Unified diff for device and vendor trees
+    │   ├── package/
+    │   │   └── ThermalMgmt.zip        # Flashable module (Author: TesterProd)
+    │   └── docs/                      # Benchmark logs, databases & vendor configs
+    │       ├── benchmark_history.txt     # Chronological benchmark log
+    │       ├── fm_local_results.db       # Raw SQLite database from 3DMark Sling Shot Extreme
+    │       ├── history.db                # Raw SQLite database pulled from Geekbench 7
+    │       ├── thermal-mgmt.txt          # Master thermal analysis & register teardown
+    │       └── vendor_configs/           # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
     │
     └── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
         ├── README.md                  # Hardware audit, linker hooks & benchmark records
+        ├── patch.patch                # Unified diff for device and vendor trees
         ├── package/
         │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: TesterProd)
-        └── template/                  # Hybrid ICD stack, companion libraries & SELinux scripts
+        └── docs/                      # Architectural blueprint & vendor configuration guide
+            └── vulkan-mgmt.txt        # Master Vulkan 1.3 hybrid architecture document
 ```
 
 ---
@@ -217,25 +222,25 @@ EvergoTweaks/
 To rebuild all KernelSU/Magisk modules and verify their zip integrity:
 
 ```bash
-python scripts/build_all.py
+python scripts/builder.py --all
 ```
 
 Or rebuild individual modules:
 
 ```bash
-python scripts/build_all.py --memory
-python scripts/build_all.py --thermal
-python scripts/build_all.py --vulkan
+python scripts/builder.py --memory
+python scripts/builder.py --thermal
+python scripts/builder.py --vulkan
 ```
 
 *Note: Flashable zips are always written exclusively to `package/<Module>/package/`.*
 
 ### Auditing Connected Device via ADB
 
-Run a full hardware, frequency, thermal, and kernel tunable audit:
+Run a full hardware, Vulkan 1.3, frequency, thermal, and kernel tunable audit:
 
 ```bash
-python scripts/verify_device.py
+python scripts/verifydevice.py
 ```
 
 ### Automated Benchmark Execution with Live Telemetry
@@ -269,10 +274,21 @@ python scripts/decrypt_thermal.py --batch package/ThermalMgmt/docs/vendor_config
 
 ### Pulling Live Benchmark Results via ADB
 
-Extract Geekbench 7 CPU & GPU compute scores directly from on-device SQLite database:
+Extract Geekbench 7 CPU & GPU and 3DMark Sling Shot Extreme scores directly from on-device SQLite databases:
 
 ```bash
-python scripts/pull_benchmark.py
+python scripts/benchpull.py
+```
+
+### Dual-Remote Submodule Synchronization (GitHub Upstream ⇄ GitLab Forks)
+
+Sync all submodules from upstream GitHub directly into GitLab forks:
+
+```powershell
+Get-ChildItem -Directory trees | ForEach-Object { 
+    git -C $_.FullName fetch origin
+    git -C $_.FullName push gitlab
+}
 ```
 
 ### Validating Device State via ADB
@@ -331,3 +347,5 @@ All agents working within this codebase must strictly observe these rules:
 8. 🔄 **Benchmark URL Maintenance:** Whenever a new peak record run is achieved, always update the official side-by-side comparison URL (`https://browser.geekbench.com/v7/cpu/compare/<NEW_RECORD_ID>?baseline=380539`) across all documentation markdown files (`README.md`, `AGENTS.md`, `package/ThermalMgmt/README.md`).
 9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\Evergo\EvergoTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
 10. 🦊 **GitLab Primacy:** Always maintain **GitLab** (`https://gitlab.com/ShovitDutta1/`) as the primary hosting and collaboration forge for EvergoTweaks and its associated trees (`device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`). All forks, branches, releases, and collaborator links must prioritize GitLab.
+11. 🌲 **Dual-Remote Submodule Integrity:** All submodules in `trees/` must preserve their dual-remote configuration (`origin` pointing to upstream GitHub, `gitlab` pointing to `https://gitlab.com/ShovitDutta1/`). Upstream synchronization must always fetch/pull from GitHub (`origin`) and push to GitLab (`gitlab`).
+

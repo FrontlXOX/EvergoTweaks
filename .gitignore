@@ -23,8 +23,10 @@ __pycache__/
 # GitNexus local analyzer cache & AST store
 .gitnexus/
 
-# Local source trees, kernel sources & vendor clones
-trees/
+# Collaborator communication staging buffer
+convo.txt
+
+# Local build and scratch caches
 build/
 out/
 scratch/

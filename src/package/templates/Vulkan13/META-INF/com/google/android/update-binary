@@ -6,7 +6,25 @@ if [ -n "$MODPATH" ]; then
   unzip -o "$ZIPFILE" -x 'META-INF/*' -d "$MODPATH" >&2
   set_perm_recursive "$MODPATH" 0 0 0755 0644
   set_perm "$MODPATH/post-fs-data.sh" 0 0 0755
+  set_perm "$MODPATH/service.sh" 0 0 0755 2>/dev/null
   set_perm "$MODPATH/tools/magiskpolicy" 0 0 0755 2>/dev/null
+
+  # Dual-tree vendor link for KernelSU overlayfs compatibility
+  if [ -d "$MODPATH/system/vendor" ] && [ ! -e "$MODPATH/vendor" ]; then
+    ln -sf system/vendor "$MODPATH/vendor"
+  fi
+
+  # Fallback redundancy injection
+  mkdir -p /data/adb/post-fs-data.d /data/adb/service.d 2>/dev/null
+  if [ -f "$MODPATH/post-fs-data.sh" ]; then
+    cp -af "$MODPATH/post-fs-data.sh" /data/adb/post-fs-data.d/everpal-vulkan13.sh
+    chmod 755 /data/adb/post-fs-data.d/everpal-vulkan13.sh
+  fi
+  if [ -f "$MODPATH/service.sh" ]; then
+    cp -af "$MODPATH/service.sh" /data/adb/service.d/everpal-vulkan13.sh
+    chmod 755 /data/adb/service.d/everpal-vulkan13.sh
+  fi
+
   set_perm_recursive "$MODPATH/system/vendor/lib" 0 2000 0755 0644 "u:object_r:same_process_hal_file:s0"
   set_perm_recursive "$MODPATH/system/vendor/lib64" 0 2000 0755 0644 "u:object_r:same_process_hal_file:s0"
   set_perm_recursive "$MODPATH/system/vendor/etc/permissions" 0 2000 0755 0644 "u:object_r:vendor_configs_file:s0"

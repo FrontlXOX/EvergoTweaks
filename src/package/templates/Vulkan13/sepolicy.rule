@@ -21,6 +21,11 @@
 #    source tree sepolicy will trigger CTS neverallow assertions during build.
 # ==============================================================================
 
+# Allow filesystem association on tmpfs for mirror-mounted vendor endpoints
+allow same_process_hal_file tmpfs filesystem { associate }
+allow vendor_configs_file tmpfs filesystem { associate }
+allow vendor_file tmpfs filesystem { associate }
+
 # SurfaceFlinger
 allow surfaceflinger vendor_file file { read open getattr execute map }
 allow surfaceflinger vendor_file dir { search read open getattr }

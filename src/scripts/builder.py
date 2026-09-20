@@ -438,17 +438,47 @@ def build_vulkan13_module(
                         shutil.copy2(os.path.join(root, f), target_loc)
                         print(f"    -> Mapped {f} to system/vendor/{rel_path}")
 
-        # Assemble flashable zip package
+        # Assemble flashable zip package with explicit Unix file permissions and symlinks
         with zipfile.ZipFile(pkg_zip, "w", zipfile.ZIP_DEFLATED) as z:
             for root, _, files in os.walk(tmp_dir):
                 for f in files:
                     full_path = os.path.join(root, f)
-                    rel_path = os.path.relpath(full_path, tmp_dir)
-                    z.write(full_path, rel_path)
+                    rel_path = os.path.relpath(full_path, tmp_dir).replace("\\", "/")
+
+                    # Preserve symbolic links
+                    if os.path.islink(full_path):
+                        link_target = os.readlink(full_path)
+                        zinfo = zipfile.ZipInfo(rel_path)
+                        zinfo.create_system = 3  # Unix
+                        zinfo.external_attr = 0o120777 << 16
+                        z.writestr(zinfo, link_target)
+                        continue
+
+                    # Executable shell scripts and binaries
+                    is_exec = (
+                        f.endswith(".sh")
+                        or rel_path.startswith("tools/")
+                        or f in ("update-binary", "busybox", "magiskboot", "magiskpolicy")
+                    )
+                    mode = 0o100755 if is_exec else 0o100644
+
+                    with open(full_path, "rb") as fp:
+                        data = fp.read()
+
+                    zinfo = zipfile.ZipInfo(rel_path)
+                    zinfo.create_system = 3  # Unix
+                    zinfo.external_attr = mode << 16
+                    z.writestr(zinfo, data)
+
+            # Inject top-level vendor -> system/vendor symlink for KernelSU overlayfs compatibility
+            zinfo_vendor = zipfile.ZipInfo("vendor")
+            zinfo_vendor.create_system = 3  # Unix
+            zinfo_vendor.external_attr = 0o120755 << 16
+            z.writestr(zinfo_vendor, "system/vendor")
 
     size_bytes = os.path.getsize(pkg_zip)
     print(
-        f"[+] Successfully built {pkg_zip} ({size_bytes} bytes / {size_bytes / 1024:.1f} KB)"
+        f"[+] Successfully built {pkg_zip} ({size_bytes} bytes / {size_bytes / (1024*1024):.2f} MB)"
     )
     return pkg_zip
 

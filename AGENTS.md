@@ -170,15 +170,15 @@ EvergoTweaks/
 │   ├── benchpull.py                   # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
 │   ├── builder.py                     # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan)
 │   ├── decrypt_thermal.py             # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
-│   ├── synctrees.py                   # Automated dual-remote tree synchronizer (GitHub ⇄ GitLab)
+│   ├── synctrees.py                   # Automated tree synchronizer for GitHub (FrontlXOX)
 │   └── verifydevice.py                # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
 │
-├── trees/                             # 🌲 Dual-Remote Git Submodules (Upstream GitHub + GitLab Forks)
-│   ├── device_xiaomi_everpal/         # Addster09 / ShovitDutta1 device tree (lineage-23.2)
-│   ├── kernel/                        # Addster09 / ShovitDutta1 Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
+├── trees/                             # 🌲 Submodule Forks on GitHub (FrontlXOX)
+│   ├── device_xiaomi_everpal/         # FrontlXOX device tree (lineage-23.2)
+│   ├── kernel/                        # FrontlXOX Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
 │   ├── kernel-5.10/                   # MediaTek 5.10 GKI donor kernel (vic, mt6789/mt6833 sibling)
-│   ├── upstream-device/               # xiaomi-mt6833-dev / ShovitDutta1 reference tree (vulkan-1.3)
-│   └── vendor_xiaomi_everpal/         # xiaomi-mt6833-dev / ShovitDutta1 vendor blobs (vulkan-1.3)
+│   ├── upstream-device/               # xiaomi-mt6833-dev reference tree (vulkan-1.3)
+│   └── vendor_xiaomi_everpal/         # FrontlXOX vendor blobs (vulkan-1.3, lineage-23.2)
 │
 ├── modules/                           # 📲 Third-Party Companion Modules (Sanctioned Rule 4 Exception)
 │   ├── *.zip                          # Curated flashable companions (ZygiskNext, LSPosed, ViPER, HideNavBar, etc.)
@@ -286,9 +286,9 @@ Extract Geekbench 7 CPU & GPU and 3DMark Sling Shot Extreme scores directly from
 python scripts/benchpull.py
 ```
 
-### Dual-Remote Submodule Synchronization (GitHub Upstream ⇄ GitLab Forks)
+### Submodule Synchronization (GitHub FrontlXOX)
 
-Sync all submodules from upstream GitHub directly into GitLab forks using the automated synchronizer:
+Sync all submodules directly into GitHub forks using the automated synchronizer:
 
 ```bash
 python scripts/synctrees.py
@@ -298,8 +298,7 @@ Or via PowerShell:
 
 ```powershell
 Get-ChildItem -Directory trees | ForEach-Object { 
-    git -C $_.FullName fetch origin
-    git -C $_.FullName push gitlab
+    git -C $_.FullName push origin
 }
 ```
 
@@ -324,7 +323,7 @@ adb shell "cat /proc/swaps; cat /proc/meminfo | grep -E 'MemTotal|MemFree|MemAva
 adb logcat -d -s lmkd
 ```
 
-### Git & GitLab Workflow
+### Git & GitHub Workflow
 
 Commit message convention: `<emoji> [<TYPE>]: <description>`
 

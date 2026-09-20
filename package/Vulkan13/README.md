@@ -5,7 +5,7 @@
 > Target Platform: **MediaTek Dimensity 810 5G (MT6833P, Mali-G57 MC2 @ 1068 MHz GED Boost)**  
 > Target OS: **Android 16 (Project Infinity / LineageOS 23.0 Base, Build BP4A.251205.006)**  
 > Target Kernel: **Linux 4.14.357-Aqua #3 SMP PREEMPT**  
-> Primary Remote: `https://gitlab.com/ShovitDutta1/EvergoTweaks`  
+> Primary Remote: `https://github.com/FrontlXOX/EvergoTweaks`  
 > Author & Maintainer: **Shovit Dutta**  
 > Special Thanks & Collaborators: **Addster09 x himanshuksr0007 (Goku)**  
 

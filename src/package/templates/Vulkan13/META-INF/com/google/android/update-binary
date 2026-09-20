@@ -18,11 +18,9 @@ if [ -n "$MODPATH" ]; then
   set_perm_recursive "$MODPATH/system/vendor/lib64" 0 2000 0755 0644 "u:object_r:same_process_hal_file:s0"
   set_perm_recursive "$MODPATH/system/vendor/etc/permissions" 0 2000 0755 0644 "u:object_r:vendor_configs_file:s0"
   set_perm_recursive "$MODPATH/system/vendor/etc/gralloc" 0 2000 0755 0644 "u:object_r:vendor_configs_file:s0"
-  chcon -R u:object_r:same_process_hal_file:s0 "$MODPATH/system/vendor/lib" 2>/dev/null
-  chcon -R u:object_r:same_process_hal_file:s0 "$MODPATH/system/vendor/lib64" 2>/dev/null
-  chcon -R u:object_r:same_process_hal_file:s0 "$MODPATH/system/vendor/etc/mali_platform.config" 2>/dev/null
-  chcon -R u:object_r:vendor_configs_file:s0 "$MODPATH/system/vendor/etc/permissions" 2>/dev/null
-  chcon -R u:object_r:vendor_configs_file:s0 "$MODPATH/system/vendor/etc/gralloc" 2>/dev/null
+  chcon -R u:object_r:same_process_hal_file:s0 "$MODPATH"/system/vendor/lib* "$MODPATH"/vendor/lib* 2>/dev/null
+  chcon -R u:object_r:same_process_hal_file:s0 "$MODPATH"/system/vendor/etc/mali_platform.config "$MODPATH"/vendor/etc/mali_platform.config 2>/dev/null
+  chcon -R u:object_r:vendor_configs_file:s0 "$MODPATH"/system/vendor/etc "$MODPATH"/vendor/etc 2>/dev/null
   exit 0
 fi
 

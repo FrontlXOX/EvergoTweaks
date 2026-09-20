@@ -23,6 +23,13 @@ if [ -z "$SRC_DIR" ]; then
     exit 1
 fi
 
+# Pre-mount SELinux context tagging on source backing files
+# Prevents EROFS failures and ensures proper SP-HAL labeling before read-only bind mounts lock inodes
+chcon -R u:object_r:same_process_hal_file:s0 "$SRC_DIR/lib"* 2>/dev/null
+chcon -R u:object_r:same_process_hal_file:s0 "$SRC_DIR/etc/mali_platform.config" 2>/dev/null
+chcon -R u:object_r:vendor_configs_file:s0 "$SRC_DIR/etc/permissions" 2>/dev/null
+chcon -R u:object_r:vendor_configs_file:s0 "$SRC_DIR/etc/gralloc" 2>/dev/null
+
 # 1. Early Property Enforcement via resetprop
 for p in \
     "ro.hardware.vulkan=mali" \

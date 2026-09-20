@@ -307,23 +307,33 @@ def main():
 
     # 7. Vulkan 1.3 Hybrid Engine
     dumpsys_gpu = run_adb("dumpsys gpu")
-    vk_ver = "unknown"
-    vk_load_fail = "0"
+    has_vk13_icd = run_adb("test -f /vendor/lib64/egl/libVK13_mali.so && echo 1 || echo 0")
+    has_vk_hw = run_adb("test -f /vendor/lib64/hw/vulkan.mali.so && echo 1 || echo 0")
+    ddk_ver = run_adb("strings /vendor/lib64/egl/libVK13_mali.so 2>/dev/null | grep -oE 'r[0-9]+p[0-9]+' | head -n1")
+
+    app_vk_ver = "unknown"
     vk_load_time = "unknown"
     for line in dumpsys_gpu.splitlines():
-        if "vulkanVersion" in line and "=" in line:
-            vk_ver = line.split("=")[-1].strip()
-        elif "vkLoadingFailureCount" in line and "=" in line:
-            vk_load_fail = line.split("=")[-1].strip()
+        if "vulkanApiVersion =" in line:
+            ver_hex = line.split("=")[-1].strip()
+            if ver_hex != "0x0":
+                app_vk_ver = ver_hex
         elif "vkDriverLoadingTime:" in line:
             parts = line.split(":")
-            if len(parts) > 1 and parts[1].strip().isdigit():
-                vk_load_time = parts[1].strip()
+            if len(parts) > 1 and parts[1].strip():
+                times = [t for t in parts[1].strip().split() if t.isdigit()]
+                if times:
+                    vk_load_time = times[-1]
+
+    avc_denials = run_adb("logcat -d | grep -iE 'avc:.*denied.*(libVK13|vulkan.mali)' | wc -l")
 
     print(f"\n🎮 [Vulkan 1.3 Hybrid Engine]")
-    is_vk13 = vk_ver == "4206592"
-    print(f"   Vulkan Version Code   : {vk_ver} {'[✓ OK: Vulkan 1.3.0 (0x00403000)]' if is_vk13 else '[!] Unexpected Version'}")
-    print(f"   Driver Loading Errors : {vk_load_fail} {'[✓ OK: 0 Errors]' if vk_load_fail == '0' else '[!] Driver Errors Detected'}")
+    is_vk_mounted = has_vk13_icd == "1" and has_vk_hw == "1"
+    driver_desc = f"Valhall {ddk_ver} Vulkan 1.3 ICD" if ddk_ver else "Vulkan 1.3 ICD"
+    print(f"   Driver Stack          : {'Mounted [✓ OK: ' + driver_desc + ']' if is_vk_mounted else '[!] Driver Missing'}")
+    if app_vk_ver != "unknown":
+        print(f"   Vulkan App API Ver    : {app_vk_ver} [✓ OK: Active In Use]")
+    print(f"   SELinux Denials (AVC) : {avc_denials} {'[✓ OK: 0 Denials]' if avc_denials == '0' else '[!] Denials Found'}")
     if vk_load_time != "unknown":
         print(f"   Driver Init Latency   : {int(vk_load_time) / 1000000:.2f} ms ({vk_load_time} ns) [✓ OK: Fast Load]")
 

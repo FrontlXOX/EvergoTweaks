@@ -79,8 +79,9 @@ if [ -d /data/adb ]; then
 
     # SELinux context tagging
     chcon -R u:object_r:system_file:s0 $MODDIR 2>/dev/null
-    chcon -R u:object_r:same_process_hal_file:s0 $MODDIR/system/vendor/lib* 2>/dev/null
-    chcon -R u:object_r:vendor_configs_file:s0 $MODDIR/system/vendor/etc 2>/dev/null
+    chcon -R u:object_r:same_process_hal_file:s0 $MODDIR/system/vendor/lib* $MODDIR/vendor/lib* 2>/dev/null
+    chcon -R u:object_r:same_process_hal_file:s0 $MODDIR/system/vendor/etc/mali_platform.config $MODDIR/vendor/etc/mali_platform.config 2>/dev/null
+    chcon -R u:object_r:vendor_configs_file:s0 $MODDIR/system/vendor/etc $MODDIR/vendor/etc 2>/dev/null
 
     ui_print "- KernelSU/Magisk vendor overlay active at $MODDIR";
     ui_print "- Vulkan 1.3 ICD, EGL, and permissions XML armed.";

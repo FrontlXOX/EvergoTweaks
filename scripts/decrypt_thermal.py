@@ -1,16 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# pylint: skip-file
-# pylint: disable=all
-# flake8: noqa
-# ruff: noqa
-# type: ignore
-"""
-Xiaomi MediaTek (MT6833/MT6833P) Thermal Config Cipher Tool
-Decrypts and encrypts Xiaomi mi_thermald AES-128-CBC vendor configurations.
-
-Key & IV: b"thermalopenssl.h" (16 bytes ASCII)
-"""
 
 import os
 import sys

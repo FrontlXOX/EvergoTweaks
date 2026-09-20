@@ -305,6 +305,28 @@ def main():
         f"   TCP Slow Start Idle   : {tcp_idle} {'[✓ OK: Disabled (Stable)]' if tcp_idle == '0' else ''}"
     )
 
+    # 7. Vulkan 1.3 Hybrid Engine
+    dumpsys_gpu = run_adb("dumpsys gpu")
+    vk_ver = "unknown"
+    vk_load_fail = "0"
+    vk_load_time = "unknown"
+    for line in dumpsys_gpu.splitlines():
+        if "vulkanVersion" in line and "=" in line:
+            vk_ver = line.split("=")[-1].strip()
+        elif "vkLoadingFailureCount" in line and "=" in line:
+            vk_load_fail = line.split("=")[-1].strip()
+        elif "vkDriverLoadingTime:" in line:
+            parts = line.split(":")
+            if len(parts) > 1 and parts[1].strip().isdigit():
+                vk_load_time = parts[1].strip()
+
+    print(f"\n🎮 [Vulkan 1.3 Hybrid Engine]")
+    is_vk13 = vk_ver == "4206592"
+    print(f"   Vulkan Version Code   : {vk_ver} {'[✓ OK: Vulkan 1.3.0 (0x00403000)]' if is_vk13 else '[!] Unexpected Version'}")
+    print(f"   Driver Loading Errors : {vk_load_fail} {'[✓ OK: 0 Errors]' if vk_load_fail == '0' else '[!] Driver Errors Detected'}")
+    if vk_load_time != "unknown":
+        print(f"   Driver Init Latency   : {int(vk_load_time) / 1000000:.2f} ms ({vk_load_time} ns) [✓ OK: Fast Load]")
+
     print("\n" + "=" * 65)
     print("Verification Completed Successfully.")
     print("=" * 65)

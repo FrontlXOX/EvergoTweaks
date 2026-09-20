@@ -205,26 +205,31 @@ def main():
     print("-" * 65)
 
     # 3. 3DMark Sling Shot Extreme
-    mark_res = pull_3dmark()
-    if mark_res:
-        print(f"[*] 3DMark Overall Score    : {mark_res['overall']}")
-        print(
-            f"[*] 3DMark Graphics Score   : {mark_res['graphics']:.0f} (GT1: {mark_res['gt1']:.2f} FPS, GT2: {mark_res['gt2']:.2f} FPS)"
-        )
-        print(
-            f"[*] 3DMark Physics Score    : {mark_res['physics']:.0f} (P1: {mark_res['p1']:.2f}, P2: {mark_res['p2']:.2f}, P3: {mark_res['p3']:.2f} FPS)"
-        )
-        scores_dump = json.dumps(
-            {
-                "overallScore": mark_res["overall"],
-                "graphicsScore": mark_res["graphics"],
-                "physicsScore": mark_res["physics"],
-                "gt1": mark_res["gt1"],
-                "gt2": mark_res["gt2"],
-            }
-        )
-        entry = f"[{now_str}] 3DMark: Test=SLING_SHOT_ES_31, Scores={scores_dump}"
-        log_history(entry)
+    mark_runs = pull_3dmark()
+    if mark_runs:
+        for mark_res in mark_runs:
+            print(f"[*] 3DMark Test API         : {mark_res['api']}")
+            print(f"[*] 3DMark Overall Score    : {mark_res['overall']}")
+            print(
+                f"[*] 3DMark Graphics Score   : {mark_res['graphics']:.0f} (GT1: {mark_res['gt1']:.2f} FPS, GT2: {mark_res['gt2']:.2f} FPS)"
+            )
+            print(
+                f"[*] 3DMark Physics Score    : {mark_res['physics']:.0f} (P1: {mark_res['p1']:.2f}, P2: {mark_res['p2']:.2f}, P3: {mark_res['p3']:.2f} FPS)"
+            )
+            scores_dump = json.dumps(
+                {
+                    "api": mark_res["api"],
+                    "overallScore": mark_res["overall"],
+                    "graphicsScore": mark_res["graphics"],
+                    "physicsScore": mark_res["physics"],
+                    "gt1": mark_res["gt1"],
+                    "gt2": mark_res["gt2"],
+                    "demo": mark_res["demo"],
+                }
+            )
+            entry = f"[{now_str}] 3DMark: Test={mark_res['api']}, Scores={scores_dump}"
+            log_history(entry)
+            print("-" * 65)
     else:
         print("[-] No 3DMark results found in database yet.")
 
@@ -243,65 +248,66 @@ def pull_3dmark():
     local_db = os.path.join(DOCS_DIR, "fm_local_results.db")
     run_adb(["pull", "/sdcard/fm_local_results.db", local_db])
     if not os.path.exists(local_db):
-        return None
+        return []
 
+    results = []
     try:
         con = sqlite3.connect(local_db)
         cur = con.cursor()
-        row = cur.execute("""
+        rows = cur.execute("""
             SELECT id, scores, result_path, date
             FROM results
-            ORDER BY id DESC LIMIT 1
-        """).fetchone()
+            ORDER BY id ASC
+        """).fetchall()
         con.close()
-        if not row:
-            return None
-        res_id, raw_scores, result_path, date_val = row
-        scores_data = json.loads(raw_scores)
-        overall = scores_data.get("overallScore", 0)
-        sub_map = {
-            item["resultType"]: item["score"]
-            for item in scores_data.get("subScores", [])
-        }
-        return {
-            "id": res_id,
-            "overall": overall,
-            "graphics": sub_map.get(
-                "SLING_SHOT_GRAPHICS_SCORE_N",
-                sub_map.get("SLING_SHOT_GRAPHICS_SCORE_B", 0),
-            ),
-            "physics": sub_map.get(
-                "SLING_SHOT_PHYSICS_SCORE_N",
-                sub_map.get("SLING_SHOT_PHYSICS_SCORE_B", 0),
-            ),
-            "gt1": sub_map.get(
-                "SLING_SHOT_GT1_N", sub_map.get("SLING_SHOT_GT1_B", 0.0)
-            ),
-            "gt2": sub_map.get(
-                "SLING_SHOT_GT2_N", sub_map.get("SLING_SHOT_GT2_B", 0.0)
-            ),
-            "demo": sub_map.get(
-                "SLING_SHOT_DEMO_N", sub_map.get("SLING_SHOT_DEMO_B", 0.0)
-            ),
-            "p1": sub_map.get(
-                "SLING_SHOT_PHYSICS_SECTION0_N",
-                sub_map.get("SLING_SHOT_PHYSICS_SECTION0_B", 0.0),
-            ),
-            "p2": sub_map.get(
-                "SLING_SHOT_PHYSICS_SECTION1_N",
-                sub_map.get("SLING_SHOT_PHYSICS_SECTION1_B", 0.0),
-            ),
-            "p3": sub_map.get(
-                "SLING_SHOT_PHYSICS_SECTION2_N",
-                sub_map.get("SLING_SHOT_PHYSICS_SECTION2_B", 0.0),
-            ),
-            "result_path": result_path,
-            "date": date_val,
-            "api": "Vulkan" if "SLING_SHOT_VULKAN" in raw_scores else "OpenGL ES 3.1",
-        }
+        for row in rows:
+            res_id, raw_scores, result_path, date_val = row
+            scores_data = json.loads(raw_scores)
+            overall = scores_data.get("overallScore", 0)
+            sub_map = {
+                item["resultType"]: item["score"]
+                for item in scores_data.get("subScores", [])
+            }
+            results.append({
+                "id": res_id,
+                "overall": overall,
+                "graphics": sub_map.get(
+                    "SLING_SHOT_GRAPHICS_SCORE_N",
+                    sub_map.get("SLING_SHOT_GRAPHICS_SCORE_B", 0),
+                ),
+                "physics": sub_map.get(
+                    "SLING_SHOT_PHYSICS_SCORE_N",
+                    sub_map.get("SLING_SHOT_PHYSICS_SCORE_B", 0),
+                ),
+                "gt1": sub_map.get(
+                    "SLING_SHOT_GT1_N", sub_map.get("SLING_SHOT_GT1_B", 0.0)
+                ),
+                "gt2": sub_map.get(
+                    "SLING_SHOT_GT2_N", sub_map.get("SLING_SHOT_GT2_B", 0.0)
+                ),
+                "demo": sub_map.get(
+                    "SLING_SHOT_DEMO_N", sub_map.get("SLING_SHOT_DEMO_B", 0.0)
+                ),
+                "p1": sub_map.get(
+                    "SLING_SHOT_PHYSICS_SECTION0_N",
+                    sub_map.get("SLING_SHOT_PHYSICS_SECTION0_B", 0.0),
+                ),
+                "p2": sub_map.get(
+                    "SLING_SHOT_PHYSICS_SECTION1_N",
+                    sub_map.get("SLING_SHOT_PHYSICS_SECTION1_B", 0.0),
+                ),
+                "p3": sub_map.get(
+                    "SLING_SHOT_PHYSICS_SECTION2_N",
+                    sub_map.get("SLING_SHOT_PHYSICS_SECTION2_B", 0.0),
+                ),
+                "result_path": result_path,
+                "date": date_val,
+                "api": "Vulkan" if "SLING_SHOT_VULKAN" in raw_scores else "OpenGL ES 3.1",
+            })
+        return results
     except Exception as e:
         print(f"Error querying 3DMark fm_local_results.db: {e}")
-        return None
+        return []
 
 
 if __name__ == "__main__":

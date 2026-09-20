@@ -1,21 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# pylint: skip-file
-# pylint: disable=all
-# flake8: noqa
-# ruff: noqa
-# type: ignore
-"""
-EvergoTweaks AutoBench — Unified Geekbench 7 Automated Benchmark Orchestrator
-Target: Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (everpal / evergo)
-Platform: MediaTek Dimensity 810 (MT6833P / MT6833)
-Capabilities:
-  - System prep, background process purge & hardware performance locks assertion
-  - Geekbench 7 CPU benchmark orchestration (Single-Core & Multi-Core)
-  - Geekbench 7 GPU Compute benchmark orchestration (Vulkan default / OpenCL)
-  - Real-time CLI live telemetry streaming (Workload name, CPU Big/Little clocks, GPU clock, battery thermals)
-  - Automated SQLite extraction, JSON parsing, and history database sync
-"""
 
 import os
 import sys

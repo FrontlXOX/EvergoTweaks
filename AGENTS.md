@@ -180,6 +180,10 @@ EvergoTweaks/
 │   ├── upstream-device/               # xiaomi-mt6833-dev / ShovitDutta1 reference tree (vulkan-1.3)
 │   └── vendor_xiaomi_everpal/         # xiaomi-mt6833-dev / ShovitDutta1 vendor blobs (vulkan-1.3)
 │
+├── modules/                           # 📲 Third-Party Companion Modules (Sanctioned Rule 4 Exception)
+│   ├── *.zip                          # Curated flashable companions (ZygiskNext, LSPosed, ViPER, HideNavBar, etc.)
+│   └── ResukiSU/                      # ReSukiSU repack tooling (main.py + python/ avb/mkbootimg helpers)
+│
 └── package/                           # 📦 Flashable Subsystems & Packaging Assets
     ├── templates/                     # Shared Magisk, KernelSU & AnyKernel3 packaging templates
     │   ├── AnyKernel3/                # Base AnyKernel3 flashable zip packaging assets
@@ -344,8 +348,8 @@ All agents working within this codebase must strictly observe these rules:
 1. 🛑 **Zero Unprompted Reboots:** NEVER execute `adb reboot` or issue reboot commands without explicit, written user permission.
 2. 🛑 **No Kernel Spinloops:** NEVER write to `/proc/driver/thermal/set_sspm_big_limit_threshold`. It causes an unkillable 84% CPU kernel IPI spinloop.
 3. 🛑 **No Backlight Tampering:** NEVER alter `mtk-cl-backlight` cooling levels in thermal configs. Doing so forces PWM brightness to 0, causing permanent black screens on lock/unlock.
-4. 🛑 **Zip Placement Boundary:** Pre-compiled flashable `.zip` archives must reside **exclusively** inside their respective `package/` directories (`package/MemoryMgmt/package/` and `package/ThermalMgmt/package/`). Never place `.zip` files in the repository root or script directories.
-5. 🛑 **Scripts Centralization Boundary:** All required Python automation, build, extraction, and verification scripts must reside **exclusively** in the root `scripts/` folder. Do not create or reintroduce scripts inside `package/*/scripts/`.
+4. 🛑 **Zip Placement Boundary:** Builder-produced EvergoTweaks flashable `.zip` archives must reside **exclusively** inside their respective `package/` directories (`package/MemoryMgmt/package/`, `package/ThermalMgmt/package/` and `package/Vulkan13/package/`). The sole sanctioned exception is the curated root `modules/` third-party companion collection (root/LSPosed/Zygisk/ReSukiSU tooling flashed alongside EvergoTweaks). Never place `.zip` files elsewhere in the repository root or script directories.
+5. 🛑 **Scripts Centralization Boundary:** All required Python automation, build, extraction, and verification scripts must reside **exclusively** in the root `scripts/` folder. Do not create or reintroduce scripts inside `package/*/scripts/`. The sole sanctioned exception is the third-party `modules/ResukiSU/` repack tooling (`main.py` + `python/` helpers), which ships verbatim as part of that companion module.
 6. 🛑 **No Secrets or Bloat:** Never commit `.env` files, API tokens, local OS metadata (`.DS_Store`, `Thumbs.db`), Python caches (`__pycache__`), or SQLite WAL journal files.
 7. 🛑 **Attribution Integrity:**
    - Magisk / KernelSU modules must maintain `author=TesterProd` strictly inside `module.prop`.

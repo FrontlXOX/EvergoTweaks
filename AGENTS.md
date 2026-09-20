@@ -170,6 +170,7 @@ EvergoTweaks/
 │   ├── benchpull.py                   # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
 │   ├── builder.py                     # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan)
 │   ├── decrypt_thermal.py             # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
+│   ├── synctrees.py                   # Automated dual-remote tree synchronizer (GitHub ⇄ GitLab)
 │   └── verifydevice.py                # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
 │
 ├── trees/                             # 🌲 Dual-Remote Git Submodules (Upstream GitHub + GitLab Forks)
@@ -282,7 +283,13 @@ python scripts/benchpull.py
 
 ### Dual-Remote Submodule Synchronization (GitHub Upstream ⇄ GitLab Forks)
 
-Sync all submodules from upstream GitHub directly into GitLab forks:
+Sync all submodules from upstream GitHub directly into GitLab forks using the automated synchronizer:
+
+```bash
+python scripts/synctrees.py
+```
+
+Or via PowerShell:
 
 ```powershell
 Get-ChildItem -Directory trees | ForEach-Object { 

@@ -437,3 +437,41 @@ All agents working within this codebase must strictly observe these rules:
 9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\Evergo\EverpalTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
 10. 🐙 **GitHub Primacy (FrontlXOX):** All project hosting, trees, forks, releases, and collaborator cherry-picks reside exclusively on **GitHub** under `https://github.com/FrontlXOX/` (`EverpalTweaks`, `device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`). GitLab has been completely deprecated per user directive.
 11. 🌲 **Submodule GitHub Tracking:** All submodules in `src/trees/` track their respective GitHub forks under `FrontlXOX` as remote `origin`. Upstream synchronization (`src/scripts/synctrees.py`) pushes directly to `origin` on GitHub.
+12. 🤖 **Sub-Agent First Policy:** Before the parent agent makes any direct code edits, file writes, or tree modifications for non-trivial tasks, it MUST first delegate discovery, auditing, and research to specialized sub-agents. The parent agent acts as orchestrator — it reads sub-agent findings, synthesizes them, then and only then executes targeted changes. Direct parent-agent edits without prior sub-agent research are only acceptable for single-line fixes, typo corrections, or trivially scoped changes confirmed at a glance.
+
+---
+
+## 8. AI Operational Directives
+
+### Sub-Agent Delegation (Mandatory)
+
+Agents MUST proactively spawn sub-agents before making changes whenever the task involves:
+
+- **Codebase exploration** — reading multiple files, directories, or submodules to understand current state
+- **Multi-tree audits** — verifying consistency across `device_xiaomi_everpal`, `vendor_xiaomi_everpal`, and `android_kernel_xiaomi_mt6833` simultaneously
+- **Security / SELinux audits** — checking policy files, file_contexts, property_contexts across the full sepolicy tree
+- **Performance / benchmark research** — cross-referencing multiple docs, benchmark DBs, and upstream references
+- **Dependency tracing** — mapping `Android.bp` module chains, `PRODUCT_PACKAGES`, `PRODUCT_COPY_FILES` across device and vendor trees
+- **Pre-implementation verification** — confirming blob paths, kernel config state, or prop values before applying patches
+
+**Spawn pattern:**
+1. Parent agent dispatches `research` sub-agent(s) with precise read-only audit prompts
+2. Sub-agent(s) report findings back
+3. Parent agent synthesizes findings and executes only the targeted, confirmed edits
+
+### Phase-Wise Execution
+
+Break down complex tasks into sequential phases:
+
+1. **Discovery & Sub-Agent Audit** — delegate broad research; never assume current state
+2. **Implementation** — targeted edits based on confirmed findings only
+3. **Verification** — run `verifydevice.py`, `builder.py --all`, or `git diff` as appropriate
+4. **Commit & Push** — granular, logically grouped commits per tree
+
+Complete and validate each phase before progressing to the next.
+
+### Background Task Rules
+
+- **No polling loops** — NEVER use `schedule` or `manage_task(status)` in a loop to wait for background tasks.
+- **Reactive wakeup** — After launching background commands or sub-agents, end the turn. The system notifies on completion.
+- **User-driven stalls** — If a task gets stuck, wait for the user to report it.

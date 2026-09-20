@@ -144,6 +144,10 @@ chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib64/hw/vulkan*.so 2>/dev/
 chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib64/egl/lib* 2>/dev/null
 chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib64/libge2.so 2>/dev/null
 chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib64/libgpd1.so 2>/dev/null
+chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib/hw/vulkan*.so 2>/dev/null
+chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib/egl/lib* 2>/dev/null
+chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib/libge2.so 2>/dev/null
+chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib/libgpd1.so 2>/dev/null
 chcon -h u:object_r:same_process_hal_file:s0 /vendor/etc/mali_platform.config 2>/dev/null
 chcon -h u:object_r:vendor_configs_file:s0 /vendor/etc/permissions/android.*vulkan*.xml 2>/dev/null
 chcon -h u:object_r:vendor_configs_file:s0 /vendor/etc/gralloc/*.xml 2>/dev/null

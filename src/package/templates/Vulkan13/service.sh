@@ -27,6 +27,10 @@ if [ ! -f /vendor/lib64/hw/vulkan.mali.so ] || [ ! -f /vendor/lib64/egl/libVK13_
     log -t "$TAG" "Warning: Core Vulkan 1.3 library endpoints missing from /vendor."
     NEED_HEAL=1
 fi
+if [ -d /vendor/lib ] && { [ ! -f /vendor/lib/hw/vulkan.mali.so ] || [ ! -f /vendor/lib/egl/libVK13_mali.so ]; }; then
+    log -t "$TAG" "Warning: 32-bit Vulkan 1.3 compatibility endpoints missing from /vendor/lib."
+    NEED_HEAL=1
+fi
 
 # Audit driver version via dumpsys gpu
 VK_VER="$(dumpsys gpu 2>/dev/null | grep -E 'vulkanVersion.*=.*' | head -n1 | cut -d= -f2 | tr -d ' ')"
@@ -62,6 +66,10 @@ chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib64/hw/vulkan*.so 2>/dev/
 chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib64/egl/lib* 2>/dev/null
 chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib64/libge2.so 2>/dev/null
 chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib64/libgpd1.so 2>/dev/null
+chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib/hw/vulkan*.so 2>/dev/null
+chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib/egl/lib* 2>/dev/null
+chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib/libge2.so 2>/dev/null
+chcon -h u:object_r:same_process_hal_file:s0 /vendor/lib/libgpd1.so 2>/dev/null
 chcon -h u:object_r:vendor_configs_file:s0 /vendor/etc/permissions/android.*vulkan*.xml 2>/dev/null
 
 log -t "$TAG" "Vulkan 1.3 watchdog finished safely. Log preserved at $LOG_FILE."

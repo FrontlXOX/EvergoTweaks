@@ -428,7 +428,7 @@ glab release create v1.0.0 "src/package/MemoryMgmt/package/MemoryMgmt.zip#Memory
 
 All agents working within this codebase must strictly observe these rules:
 
-1. 🛑 **Zero Unprompted Reboots:** NEVER execute `adb reboot` or issue reboot commands without explicit, written user permission.
+1. 🔄 **Reboot Discipline:** `adb reboot` is allowed when the task requires it (e.g., activating a flashed module). After every reboot, ALWAYS run `adb wait-for-device` before issuing further commands, then tail realtime logs (`adb logcat`) to catch bootloops, SELinux denials, or service crashes early.
 2. 🛑 **No Kernel Spinloops:** NEVER write to `/proc/driver/thermal/set_sspm_big_limit_threshold`. It causes an unkillable 84% CPU kernel IPI spinloop.
 3. 🛑 **No Backlight Tampering:** NEVER alter `mtk-cl-backlight` cooling levels in thermal configs. Doing so forces PWM brightness to 0, causing permanent black screens on lock/unlock.
 4. 🛑 **Zip Placement Boundary:** Builder-produced EverpalTweaks flashable `.zip` archives must reside **exclusively** inside their respective `src/package/` directories (`src/package/MemoryMgmt/package/`, `src/package/ThermalMgmt/package/`, `src/package/Vulkan13/package/`, and `src/package/SpatialAudio/package/`). The sole sanctioned exception is the curated root `src/modules/` third-party companion collection (root/LSPosed/Zygisk/ReSukiSU tooling flashed alongside EverpalTweaks). Never place `.zip` files elsewhere in the repository root or script directories.

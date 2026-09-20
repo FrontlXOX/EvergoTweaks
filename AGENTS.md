@@ -186,13 +186,11 @@ EvergoTweaks/
 ├── CHANGELOG.md                       # Comprehensive version history & benchmark progression
 ├── LICENSE                            # Apache 2.0 License
 ├── .gitignore                         # Build outputs, temporary files, and platform artifacts
-├── .pylintrc                          # Universal Python linter configuration
-├── pyproject.toml                     # Pyright/Ruff/Flake8 root tool configuration
 │
 ├── scripts/                           # 🛠️ Centralized Repository Automation Tooling (Root-Only)
 │   ├── autobench.py                   # Automated Geekbench 7 (CPU + GPU Vulkan) suite with real-time CLI telemetry
 │   ├── benchpull.py                   # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
-│   ├── builder.py                     # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan)
+│   ├── builder.py                     # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan, --spatial)
 │   ├── decrypt_thermal.py             # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
 │   ├── synctrees.py                   # Automated tree synchronizer for GitHub (FrontlXOX)
 │   └── verifydevice.py                # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI

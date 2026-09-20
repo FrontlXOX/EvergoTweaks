@@ -137,15 +137,14 @@ EvergoTweaks/
 ├── CHANGELOG.md                       # Version history & complete benchmark progression
 ├── LICENSE                            # Apache 2.0 License
 ├── .gitignore                         # Standard exclusion rules
-├── .pylintrc                          # Universal Python linter configuration
-├── pyproject.toml                     # Pyright/Ruff/Flake8 root tool configuration
 │
 ├── scripts/                           # 🛠️ Centralized Repository Automation Tooling (Root-Only)
 │   ├── autobench.py                   # Automated Geekbench 7 (CPU + GPU Vulkan) suite with real-time CLI telemetry
-│   ├── build_all.py                   # Unified module packager & CRC-32 validator (--memory, --thermal)
+│   ├── benchpull.py                   # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
+│   ├── builder.py                     # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan, --spatial)
 │   ├── decrypt_thermal.py             # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
-│   ├── pull_benchmark.py              # Automated ADB extractor for Geekbench 7 CPU & GPU SQLite DB
-│   └── verify_device.py               # Live ADB hardware & kernel parameter audit CLI
+│   ├── synctrees.py                   # Submodule tree synchronizer for FrontlXOX GitHub forks
+│   └── verifydevice.py                # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
 │
 ├── trees/                             # 🌲 Upstream Git Submodules (Reference trees)
 │   ├── device_xiaomi_everpal/         # Addster09/device_xiaomi_everpal (lineage-23.2)

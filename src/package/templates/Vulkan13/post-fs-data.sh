@@ -48,7 +48,7 @@ for p in \
     "ro.vendor.arm.egl.configs.r8_g8_b8_a0_24bit_yuv_special.framebuffer_target=false"; do
     key="${p%%=*}"
     val="${p#*=}"
-    resetprop -n "$key" "$val" 2>/dev/null || setprop "$key" "$val" 2>/dev/null
+    resetprop -n "$key" "$val" 2>/dev/null
 done
 
 # Helper: Atomic individual file bind mount
@@ -67,24 +67,26 @@ overlay_or_mirror_dir() {
     [ ! -d "$src_dir" ] && return 0
     [ ! -d "$dst_dir" ] && return 0
 
-    # Strategy A: Kernel OverlayFS (read-only dual lowerdir)
-    if mount -t overlay overlay -o lowerdir="$src_dir:$dst_dir" "$dst_dir" 2>/dev/null; then
-        chcon -R "$scontext" "$dst_dir" 2>/dev/null
+    # Strategy A: Kernel OverlayFS (atomic SELinux context on read-only lowerdirs)
+    if mount -t overlay overlay -o lowerdir="$src_dir:$dst_dir",context="$scontext" "$dst_dir" 2>/dev/null; then
         log -t "$TAG" "OverlayFS mount successful on $dst_dir"
         return 0
     fi
 
     # Strategy B: Tmpfs Mirror Mount (Universal EROFS Fallback)
     local staging="$MIRROR_BASE/$mirror_sub"
+    rm -rf "$staging" 2>/dev/null
     mkdir -p "$staging"
     cp -af "$dst_dir"/* "$staging"/ 2>/dev/null
     cp -af "$src_dir"/* "$staging"/ 2>/dev/null
+    chown -R 0:0 "$staging" 2>/dev/null
     chmod 755 "$staging"
     chcon -R "$scontext" "$staging" 2>/dev/null
 
     if mount -o bind "$staging" "$dst_dir" 2>/dev/null; then
+        mount -o bind,remount,ro "$dst_dir" 2>/dev/null
         chcon -h "$scontext" "$dst_dir" 2>/dev/null
-        log -t "$TAG" "Tmpfs mirror mount successful on $dst_dir"
+        log -t "$TAG" "Tmpfs mirror mount successful on $dst_dir (read-only secured)"
         return 0
     fi
 

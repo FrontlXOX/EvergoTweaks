@@ -77,24 +77,12 @@ if [ -d /data/adb ]; then
     [ -f $MODDIR/post-fs-data.sh ] && chmod 755 $MODDIR/post-fs-data.sh
     [ -f $MODDIR/service.sh ] && chmod 755 $MODDIR/service.sh
 
-    # Standalone redundancy injection for post-fs-data.d and service.d
-    mkdir -p /data/adb/post-fs-data.d /data/adb/service.d
-    if [ -f $home/post-fs-data.sh ]; then
-        cp -af $home/post-fs-data.sh /data/adb/post-fs-data.d/everpal-vulkan13.sh
-        chmod 755 /data/adb/post-fs-data.d/everpal-vulkan13.sh
-    fi;
-    if [ -f $home/service.sh ]; then
-        cp -af $home/service.sh /data/adb/service.d/everpal-vulkan13.sh
-        chmod 755 /data/adb/service.d/everpal-vulkan13.sh
-    fi;
-
     # SELinux context tagging
     chcon -R u:object_r:system_file:s0 $MODDIR 2>/dev/null
     chcon -R u:object_r:same_process_hal_file:s0 $MODDIR/system/vendor/lib* 2>/dev/null
     chcon -R u:object_r:vendor_configs_file:s0 $MODDIR/system/vendor/etc 2>/dev/null
 
     ui_print "- KernelSU/Magisk vendor overlay active at $MODDIR";
-    ui_print "- Redundancy hooks installed to post-fs-data.d and service.d";
     ui_print "- Vulkan 1.3 ICD, EGL, and permissions XML armed.";
 else
     ui_print "- /data/adb not accessible (pure recovery or encrypted /data).";

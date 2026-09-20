@@ -48,7 +48,7 @@ package/MemoryMgmt/
 ├── patch.patch                    # Standalone unified git patch for device_xiaomi_everpal
 │
 ├── package/                       # Production flashable KernelSU / Magisk module
-│   └── MemoryMgmt.zip             # Flashable module (Author: TesterProd)
+│   └── MemoryMgmt.zip             # Flashable module (Author: FrontlXOX)
 │
 └── docs/                          # Complete architectural blueprint & integration guide
     └── memory-mgmt.txt            # Master blueprint (TL;DR, QA audit, hardware zone math, git diff)

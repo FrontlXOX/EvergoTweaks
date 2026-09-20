@@ -153,7 +153,7 @@ Apply `patch.patch`:
    ```
 
 Option B: Systemless KernelSU / Magisk Module
-Install `ThermalMgmt/package/ThermalMgmt.zip` (Author: TesterProd):
+Install `ThermalMgmt/package/ThermalMgmt.zip` (Author: FrontlXOX):
 - Overlays `thermal-normal.conf` with `thermal-nolimits.conf`.
 - Sets `sconfig 10` upon boot completion.
 - Verifies CPU policy scaling limits.

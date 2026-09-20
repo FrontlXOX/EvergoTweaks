@@ -2,5 +2,5 @@ id=everpal-vulkan13
 name=Everpal Vulkan 1.3 Hybrid Engine
 version=v1
 versionCode=1
-author=TesterProd
+author=FrontlXOX
 description=Master Vulkan 1.3 graphics architecture for Xiaomi Everpal/Evergo (MT6833P / Dimensity 810). Couples Valhall r49p1 Vulkan 1.3 ARM Mali-G57 ICD with certified Android 15/16 HAL (VK_KHR_dynamic_rendering, VK_KHR_synchronization2, extendedDynamicState).

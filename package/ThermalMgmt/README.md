@@ -66,7 +66,7 @@ package/ThermalMgmt/
 ├── patch.patch                        # Unified git patch for device_xiaomi_everpal
 │
 ├── package/                           # Production flashable KernelSU / Magisk module
-│   └── ThermalMgmt.zip                # Production Master Thermal module (Author: TesterProd)
+│   └── ThermalMgmt.zip                # Production Master Thermal module (Author: FrontlXOX)
 │
 └── docs/                              # Deep technical documentation & benchmark artifacts
     ├── thermal-mgmt.txt               # Master engineering manual & Addster integration guide

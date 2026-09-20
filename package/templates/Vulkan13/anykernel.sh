@@ -1,7 +1,7 @@
 ### AnyKernel3 Ramdisk Mod & KernelSU Vulkan 1.3 Installer Script
 ## Architecture: MediaTek MT6833P / Dimensity 810 (everpal / evergo)
 ## Author: Shovit Dutta & Addster09
-## Module Author: TesterProd
+## Module Author: FrontlXOX
 
 ### AnyKernel setup
 # global properties

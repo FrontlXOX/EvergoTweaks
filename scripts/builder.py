@@ -62,7 +62,7 @@ def build_memory_module(root_dir: str) -> str:
 name=Everpal Memory Management
 version=v1
 versionCode=1
-author=TesterProd
+author=FrontlXOX
 description=Master RAM & LMKD architecture for Xiaomi Everpal/Evergo (MT6833P / Dimensity 810). Adaptive ZRAM (3.58GB 4GB / 75% 6-8GB LZ4), swappiness 80, watermark_scale_factor 20, adaptive min_free_kbytes (24-40MB), swap_free_low 2%, UFS 512kB read-ahead. Eliminates direct reclaim stalls and aggressive app kills.
 """
         with open(
@@ -233,7 +233,7 @@ def build_thermal_module(root_dir: str) -> str:
 name=Everpal Thermal Management & Performance Master
 version=v1
 versionCode=1
-author=TesterProd
+author=FrontlXOX
 description=Hardware compute master for Xiaomi Everpal/Evergo (Dimensity 810). Decouples thermal regulation from missing joyose, locks sconfig 10 (55°C headroom), pins CoreLink CCI at 1.6 GHz, accelerates Mali-G57 GPU DVFS to 50ms with 1068MHz boost, and unlocks full 2.4 GHz Big core capability.
 """
         with open(

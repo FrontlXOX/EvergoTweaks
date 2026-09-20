@@ -2,7 +2,7 @@
 """EvergoTweaks Submodule Upstream Synchronizer.
 
 Synchronizes all local source and vendor trees from upstream GitHub repositories
-(remote 'origin') directly into GitLab forks (remote 'gitlab').
+directly into FrontlXOX GitHub forks (remote 'origin').
 """
 
 import os
@@ -83,7 +83,7 @@ def main() -> int:
         return 1
 
     print("=" * 60)
-    print(f"{BOLD} EvergoTweaks Dual-Remote Tree Synchronizer (GitHub ⇄ GitLab){RESET}")
+    print(f"{BOLD} EvergoTweaks Submodule Tree Synchronizer (FrontlXOX GitHub){RESET}")
     print("=" * 60)
 
     subtrees = [d for d in trees_dir.iterdir() if d.is_dir() and (d / ".git").exists()]

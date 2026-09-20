@@ -24,7 +24,7 @@ This repository maintains two production-grade subsystems:
 - **Special Thanks & Collaborators:**
   - **Device & Kernel Maintainer:** Addster09 ([`device_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal), [`vendor_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/vendor_xiaomi_everpal), [`android_kernel_xiaomi_mt6833`](https://github.com/Addster09/android_kernel_xiaomi_mt6833))
   - **Android 16 Bringup & Memory Tuning:** himanshuksr0007 (Goku / Sudoku)
-- **Flashable Module Author (`module.prop` metadata only):** `TesterProd`
+- **Flashable Module Author (`module.prop` metadata):** `FrontlXOX`
 
 ---
 
@@ -194,7 +194,7 @@ EvergoTweaks/
     │   ├── README.md                  # Comprehensive technical manual & QA zone math audit
     │   ├── patch.patch                # Unified diff for device_xiaomi_everpal
     │   ├── package/
-    │   │   └── MemoryMgmt.zip         # Flashable module (Author: TesterProd)
+    │   │   └── MemoryMgmt.zip         # Flashable module (Author: FrontlXOX)
     │   └── docs/                      # Architectural blueprint & integration guide
     │       └── memory-mgmt.txt        # Master blueprint, LMKD tuning logic & git diffs
     │
@@ -202,7 +202,7 @@ EvergoTweaks/
     │   ├── README.md                  # Hardware audit, decrypted Xiaomi profiles & profile tables
     │   ├── patch.patch                # Unified diff for device and vendor trees
     │   ├── package/
-    │   │   └── ThermalMgmt.zip        # Flashable module (Author: TesterProd)
+    │   │   └── ThermalMgmt.zip        # Flashable module (Author: FrontlXOX)
     │   └── docs/                      # Benchmark logs, databases & vendor configs
     │       ├── benchmark_history.txt     # Chronological benchmark log
     │       ├── fm_local_results.db       # Raw SQLite database from 3DMark Sling Shot Extreme
@@ -214,7 +214,7 @@ EvergoTweaks/
         ├── README.md                  # Hardware audit, linker hooks & benchmark records
         ├── patch.patch                # Unified diff for device and vendor trees
         ├── package/
-        │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: TesterProd)
+        │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: FrontlXOX)
         └── docs/                      # Architectural blueprint & vendor configuration guide
             └── vulkan-mgmt.txt        # Master Vulkan 1.3 hybrid architecture document
 ```
@@ -351,10 +351,10 @@ All agents working within this codebase must strictly observe these rules:
 5. 🛑 **Scripts Centralization Boundary:** All required Python automation, build, extraction, and verification scripts must reside **exclusively** in the root `scripts/` folder. Do not create or reintroduce scripts inside `package/*/scripts/`. The sole sanctioned exception is the third-party `modules/ResukiSU/` repack tooling (`main.py` + `python/` helpers), which ships verbatim as part of that companion module.
 6. 🛑 **No Secrets or Bloat:** Never commit `.env` files, API tokens, local OS metadata (`.DS_Store`, `Thumbs.db`), Python caches (`__pycache__`), or SQLite WAL journal files.
 7. 🛑 **Attribution Integrity:**
-   - Magisk / KernelSU modules must maintain `author=TesterProd` strictly inside `module.prop`.
+   - Magisk / KernelSU modules must maintain `author=FrontlXOX` strictly inside `module.prop`.
    - General project authorship and maintainership belongs to `Author & Maintainer: Shovit Dutta`.
    - Architectural and research credits honor: `Special Thanks & Collaborators: Addster09 x himanshuksr0007 (Goku)`.
-   - Under NO circumstances should `TesterProd` be listed under Authors & Credits in documentation.
+   - Under NO circumstances should `FrontlXOX` be listed under Authors & Credits in documentation (project authorship belongs to Shovit Dutta).
 8. 🔄 **Benchmark URL Maintenance:** Whenever a new peak record run is achieved, always update the official side-by-side comparison URL (`https://browser.geekbench.com/v7/cpu/compare/<NEW_RECORD_ID>?baseline=380539`) across all documentation markdown files (`README.md`, `AGENTS.md`, `package/ThermalMgmt/README.md`).
 9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\Evergo\EvergoTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
 10. 🐙 **GitHub Primacy (FrontlXOX):** All project hosting, trees, forks, releases, and collaborator cherry-picks reside exclusively on **GitHub** under `https://github.com/FrontlXOX/` (`EvergoTweaks`, `device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`). GitLab has been completely deprecated per user directive.

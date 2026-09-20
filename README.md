@@ -161,7 +161,7 @@ EvergoTweaks/
     │   ├── README.md                  # Detailed technical manual & QA audit
     │   ├── patch.patch                # Unified git patch for device_xiaomi_everpal
     │   ├── package/
-    │   │   └── MemoryMgmt.zip         # Flashable module (Author: TesterProd)
+    │   │   └── MemoryMgmt.zip         # Flashable module (Author: FrontlXOX)
     │   └── docs/                      # Architectural blueprint & integration guide
     │       └── memory-mgmt.txt        # Master blueprint, LMKD tuning logic & zone math
     │
@@ -169,7 +169,7 @@ EvergoTweaks/
         ├── README.md                  # Hardware audit & decrypted Xiaomi AES configuration breakdown
         ├── patch.patch                # Unified git patch for device & vendor trees
         ├── package/
-        │   └── ThermalMgmt.zip        # Flashable module (Author: TesterProd)
+        │   └── ThermalMgmt.zip        # Flashable module (Author: FrontlXOX)
         └── docs/                      # Benchmark logs, SQLite database & vendor configs
             ├── benchmark_history.txt  # Chronological benchmark log
             ├── history.db             # Raw SQLite database pulled from Geekbench 7
@@ -179,7 +179,7 @@ EvergoTweaks/
     └── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
         ├── README.md                  # Architecture, linker hooks & benchmark audit
         ├── package/
-        │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: TesterProd)
+        │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: FrontlXOX)
         └── template/                  # Hybrid ICD stack, companion libraries & SELinux scripts
 ```
 

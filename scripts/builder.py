@@ -454,6 +454,138 @@ def build_vulkan13_module(
 
 
 # ==============================================================================
+# 4. SPATIAL AUDIO ROUTING FIX MODULE
+# ==============================================================================
+def build_spatial_module(root_dir: str) -> str:
+    template_meta = get_template_meta(root_dir)
+    tpl_dir = os.path.join(root_dir, "package", "templates", "SpatialAudio")
+    out_dir = os.path.join(root_dir, "package", "SpatialAudio", "package")
+    os.makedirs(out_dir, exist_ok=True)
+    pkg_zip = os.path.join(out_dir, "SpatialAudio.zip")
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        meta_dir = os.path.join(tmp_dir, "META-INF", "com", "google", "android")
+        os.makedirs(meta_dir, exist_ok=True)
+
+        module_prop = """id=everpal-spatial-audio
+name=Everpal Spatial Audio Routing Fix
+version=v1
+versionCode=1
+author=FrontlXOX
+description=Spatial audio routing fix for Xiaomi Everpal/Evergo (MT6833 / Dimensity 810). Constrains immersive_out to single active spatializer, enables multichannel 5.1/7.1 channelMasks, decouples Dolby DAP/DVL from global spatializer thread, disables speaker spatializer and headtracking retry loops, disables ultrasound proximity, and enables legacy spatializer parameter queries.
+"""
+        with open(
+            os.path.join(tmp_dir, "module.prop"), "w", encoding="utf-8", newline="\n"
+        ) as f:
+            f.write(module_prop)
+
+        system_prop = """# system.prop — Everpal Spatial Audio & Routing Fix
+# Author: FrontlXOX x himanshuksr0007 (Goku)
+
+# Spatial Audio Routing & Head-Tracking Constraints
+persist.vendor.audio.spatializer.speaker_enabled=false
+ro.audio.spatializer.headtracking_supported=false
+ro.audio.spatializer.use_legacy_param_query=true
+ro.audio.monitorRotation=false
+
+# Ultrasound Proximity (disabled on everpal to prevent audioserver crashes)
+ro.vendor.audio.us.proximity=false
+"""
+        with open(
+            os.path.join(tmp_dir, "system.prop"), "w", encoding="utf-8", newline="\n"
+        ) as f:
+            f.write(system_prop)
+
+        post_fs_data_sh = """#!/system/bin/sh
+MODDIR=${0%/*}
+
+# Set SELinux contexts on vendor overlay files
+chcon -R u:object_r:vendor_configs_file:s0 "$MODDIR/system/vendor/etc" 2>/dev/null
+
+# Enforce spatial audio and routing properties before audioserver initialization
+resetprop -n persist.vendor.audio.spatializer.speaker_enabled false
+resetprop -n ro.audio.spatializer.headtracking_supported false
+resetprop -n ro.audio.spatializer.use_legacy_param_query true
+resetprop -n ro.audio.monitorRotation false
+resetprop -n ro.vendor.audio.us.proximity false
+"""
+        with open(
+            os.path.join(tmp_dir, "post-fs-data.sh"), "w", encoding="utf-8", newline="\n"
+        ) as f:
+            f.write(post_fs_data_sh)
+
+        sepolicy_rule = """# ==============================================================================
+# EvergoTweaks Spatial Audio SELinux Policies (KernelSU / Magisk Runtime Only)
+# ==============================================================================
+# Allow audio HAL to read vendor properties at startup
+allow hal_audio_default vendor_default_prop file { read open getattr map }
+allow hal_audio_default vendor_default_prop dir { search read open getattr }
+
+# Allow audioserver and audio HAL to read overlay configs
+allow hal_audio_default vendor_configs_file file { read open getattr map }
+allow hal_audio_default vendor_file file { read open getattr map }
+allow audioserver vendor_configs_file file { read open getattr map }
+allow audioserver vendor_file file { read open getattr map }
+"""
+        with open(
+            os.path.join(tmp_dir, "sepolicy.rule"), "w", encoding="utf-8", newline="\n"
+        ) as f:
+            f.write(sepolicy_rule)
+
+        # Create system/vendor/etc directory
+        vendor_etc_dir = os.path.join(tmp_dir, "system", "vendor", "etc")
+        os.makedirs(vendor_etc_dir, exist_ok=True)
+
+        shutil.copy2(
+            os.path.join(tpl_dir, "audio_policy_configuration.xml"),
+            os.path.join(vendor_etc_dir, "audio_policy_configuration.xml"),
+        )
+        shutil.copy2(
+            os.path.join(tpl_dir, "audio_effects.xml"),
+            os.path.join(vendor_etc_dir, "audio_effects.xml"),
+        )
+
+        # Installer scripts
+        update_binary = """#!/sbin/sh
+# Magisk / KernelSU / APatch module installer stub
+umask 022
+SKIPUNZIP=1
+unzip -o "$ZIPFILE" -x 'META-INF/*' -d "$MODPATH" >&2
+set_perm_recursive "$MODPATH" 0 0 0755 0644
+set_perm "$MODPATH/post-fs-data.sh" 0 0 0755
+set_perm_recursive "$MODPATH/system/vendor/etc" 0 2000 0755 0644 "u:object_r:vendor_configs_file:s0"
+chcon -R u:object_r:vendor_configs_file:s0 "$MODPATH/system/vendor/etc" 2>/dev/null
+exit 0
+"""
+        with open(
+            os.path.join(meta_dir, "update-binary"), "w", encoding="utf-8", newline="\n"
+        ) as f:
+            f.write(update_binary)
+
+        with open(
+            os.path.join(meta_dir, "updater-script"), "w", encoding="utf-8", newline="\n"
+        ) as f:
+            f.write("# MAGISK\n")
+
+        with zipfile.ZipFile(pkg_zip, "w", zipfile.ZIP_DEFLATED) as z:
+            for root, _, files in os.walk(tmp_dir):
+                for f in files:
+                    full_path = os.path.join(root, f)
+                    rel_path = os.path.relpath(full_path, tmp_dir)
+                    z.write(full_path, rel_path)
+
+            # Unix symlink vendor -> ./system/vendor
+            zip_info = zipfile.ZipInfo("vendor")
+            zip_info.create_system = 3
+            zip_info.external_attr = 0o120755 << 16
+            z.writestr(zip_info, "./system/vendor")
+
+    size = os.path.getsize(pkg_zip)
+    print(f"[+] Successfully built {pkg_zip} ({size} bytes)")
+    return pkg_zip
+
+
+# ==============================================================================
 # CRC-32 & PACKAGE VALIDATION
 # ==============================================================================
 def verify_package(zip_path: str) -> bool:
@@ -494,6 +626,9 @@ def main():
         "--vulkan", "-v", action="store_true", help="Build Vulkan13-KernelSU.zip"
     )
     parser.add_argument(
+        "--spatial", "-s", action="store_true", help="Build SpatialAudio.zip"
+    )
+    parser.add_argument(
         "--kernel", "-k", default=None, help="Path to compiled Image.gz (for Vulkan13)"
     )
     parser.add_argument(
@@ -508,23 +643,26 @@ def main():
     build_mem = args.memory
     build_therm = args.thermal
     build_vulk = args.vulkan
+    build_spatial = args.spatial
 
     # Default to building all if no specific target is given
-    if not (build_mem or build_therm or build_vulk) or args.all:
+    if not (build_mem or build_therm or build_vulk or build_spatial) or args.all:
         build_mem = True
         build_therm = True
         build_vulk = True
+        build_spatial = True
 
     print("=" * 60)
     print(" EvergoTweaks Master Module Builder & Validator")
     print("=" * 60)
 
-    total_steps = sum([build_mem, build_therm, build_vulk])
+    total_steps = sum([build_mem, build_therm, build_vulk, build_spatial])
     step = 1
 
     mem_zip = None
     therm_zip = None
     vulk_zip = None
+    spatial_zip = None
 
     if build_mem:
         print(f"\n[{step}/{total_steps}] Building MemoryMgmt.zip...")
@@ -546,6 +684,11 @@ def main():
         )
         step += 1
 
+    if build_spatial:
+        print(f"\n[{step}/{total_steps}] Building SpatialAudio.zip...")
+        spatial_zip = build_spatial_module(REPO_ROOT)
+        step += 1
+
     print("\n" + "=" * 60)
     print(" Verifying Packages (CRC-32 & Structure)")
     print("=" * 60)
@@ -559,6 +702,9 @@ def main():
 
     if build_vulk and vulk_zip:
         all_ok = all_ok and verify_package(vulk_zip)
+
+    if build_spatial and spatial_zip:
+        all_ok = all_ok and verify_package(spatial_zip)
 
     if all_ok:
         print("\n[+] All requested modules successfully built and verified!\n")

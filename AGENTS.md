@@ -17,6 +17,8 @@ This repository maintains two production-grade subsystems:
 
 1. **`MemoryMgmt/`** — Resolves MT6833 `Zone Normal` memory exhaustion, tunes Android 16 LMKD watermarks, and scales ZRAM to 3.58 GB LZ4 for zero direct reclaim stalls and 100% background app retention.
 2. **`ThermalMgmt/`** — Decrypts Xiaomi OpenSSL AES-128-CBC thermal profiles, decouples thermal regulation from missing proprietary `joyose`, maps `sconfig 10` (NoLimits profile with 55°C headroom), and uncaps Cortex-A76 Big cores (2.4 GHz) and Mali-G57 GPU clocks.
+3. **`Vulkan13/`** — Hybrid decoupled graphics stack deploying HyperOS 3.0 Valhall r49p1 Vulkan 1.3 ICD, companion linker shims (`libgpd1.so`, `libge2.so`), and certified Android 15/16 HAL manifests.
+4. **`SpatialAudio/`** — Eliminates wired headset spatial audio routing storms, serializes `immersive_out` mixPort concurrency (`maxOpenCount=1 maxActiveCount=1`), decouples Dolby DAP stream postprocessing, disables speaker spatializer and headtracking loops, and bypasses missing MTK parameter queries.
 
 ### Authorship & Collaborator Attribution
 
@@ -128,6 +130,25 @@ ARM Mali GPUs require strict synchronization between the user-space driver (`vul
 
 ---
 
+### D. Spatial Audio Subsystem (`package/SpatialAudio/`)
+
+#### The Routing Storm & HAL Misalignment
+On Android 16, connecting wired headsets triggered an aggressive create/releaseAudioPatch loop (~20 round-trips/min) and Downmix_Configure errors. Root causes:
+1. `immersive_out` mixPort lacked `maxOpenCount="1" maxActiveCount="1"`, allowing MT6359 accdet debounce chatter to open multiple concurrent spatializer streams.
+2. Global Dolby DAP and volume listeners attached to the `AUDIO_OUTPUT_FLAG_SPATIALIZER` thread, which AudioFlinger rejects.
+3. Android `SpatializerHelper` attempted to register the mono speaker amp (sia81xx/AW87389) as an HRTF spatial device, spinning a 43-second sensor discovery loop due to missing head-tracking HAL.
+4. MediaTek audio HAL crashed trying to calibrate missing ultrasound proximity hardware (`ro.vendor.audio.us.proximity=true`).
+
+#### Production Solution
+Applied via `package/SpatialAudio/patch.patch` and `package/SpatialAudio/package/SpatialAudio.zip`:
+- Enforces `maxOpenCount="1" maxActiveCount="1"` on `immersive_out` and adds `5POINT1` / `7POINT1` channel masks.
+- Decouples Dolby DAP / DVL into per-session stream postprocessors (`music`, `ring`, `alarm`, `notification`, `voice_call`), keeping the spatializer thread clean.
+- Sets `persist.vendor.audio.spatializer.speaker_enabled=false`, `ro.audio.spatializer.headtracking_supported=false`, `ro.audio.monitorRotation=false`, and `ro.vendor.audio.us.proximity=false`.
+- Enables `ro.audio.spatializer.use_legacy_param_query=true` to handle MTK spatializer HAL query fallback.
+- Injects `allow hal_audio_default vendor_default_prop` SELinux permissions.
+
+---
+
 ## 4. Empirical Benchmark Records & Baselines
 
 These verified numbers represent the ground truth performance achievable with this repository:
@@ -212,14 +233,21 @@ EvergoTweaks/
     │       ├── history.db                # Raw SQLite database pulled from Geekbench 7
     │       ├── thermal-mgmt.txt          # Master thermal analysis & register teardown
     │       └── vendor_configs/           # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
+    ├── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
+    │   ├── README.md                  # Hardware audit, linker hooks & benchmark records
+    │   ├── patch.patch                # Unified diff for device and vendor trees
+    │   ├── package/
+    │   │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: FrontlXOX)
+    │   └── docs/                      # Architectural blueprint & vendor configuration guide
+    │       └── vulkan-mgmt.txt        # Master Vulkan 1.3 hybrid architecture document
     │
-    └── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
-        ├── README.md                  # Hardware audit, linker hooks & benchmark records
-        ├── patch.patch                # Unified diff for device and vendor trees
+    └── SpatialAudio/                  # 🎧 Spatial Audio Routing & Hardware Constraint Subsystem
+        ├── README.md                  # Hardware audit, routing cascade analysis & HAL tunables
+        ├── patch.patch                # Unified diff for device_xiaomi_everpal
         ├── package/
-        │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: FrontlXOX)
-        └── docs/                      # Architectural blueprint & vendor configuration guide
-            └── vulkan-mgmt.txt        # Master Vulkan 1.3 hybrid architecture document
+        │   └── SpatialAudio.zip       # Flashable module (Author: FrontlXOX)
+        └── docs/                      # Architectural blueprint & technical breakdown
+            └── spatial-audio.txt      # Master spatial audio routing document
 ```
 
 ---
@@ -240,6 +268,7 @@ Or rebuild individual modules:
 python scripts/builder.py --memory
 python scripts/builder.py --thermal
 python scripts/builder.py --vulkan
+python scripts/builder.py --spatial
 ```
 
 _Note: Flashable zips are always written exclusively to `package/<Module>/package/`._
@@ -350,7 +379,7 @@ All agents working within this codebase must strictly observe these rules:
 1. 🛑 **Zero Unprompted Reboots:** NEVER execute `adb reboot` or issue reboot commands without explicit, written user permission.
 2. 🛑 **No Kernel Spinloops:** NEVER write to `/proc/driver/thermal/set_sspm_big_limit_threshold`. It causes an unkillable 84% CPU kernel IPI spinloop.
 3. 🛑 **No Backlight Tampering:** NEVER alter `mtk-cl-backlight` cooling levels in thermal configs. Doing so forces PWM brightness to 0, causing permanent black screens on lock/unlock.
-4. 🛑 **Zip Placement Boundary:** Builder-produced EvergoTweaks flashable `.zip` archives must reside **exclusively** inside their respective `package/` directories (`package/MemoryMgmt/package/`, `package/ThermalMgmt/package/` and `package/Vulkan13/package/`). The sole sanctioned exception is the curated root `modules/` third-party companion collection (root/LSPosed/Zygisk/ReSukiSU tooling flashed alongside EvergoTweaks). Never place `.zip` files elsewhere in the repository root or script directories.
+4. 🛑 **Zip Placement Boundary:** Builder-produced EvergoTweaks flashable `.zip` archives must reside **exclusively** inside their respective `package/` directories (`package/MemoryMgmt/package/`, `package/ThermalMgmt/package/`, `package/Vulkan13/package/`, and `package/SpatialAudio/package/`). The sole sanctioned exception is the curated root `modules/` third-party companion collection (root/LSPosed/Zygisk/ReSukiSU tooling flashed alongside EvergoTweaks). Never place `.zip` files elsewhere in the repository root or script directories.
 5. 🛑 **Scripts Centralization Boundary:** All required Python automation, build, extraction, and verification scripts must reside **exclusively** in the root `scripts/` folder. Do not create or reintroduce scripts inside `package/*/scripts/`. The sole sanctioned exception is the third-party `modules/ResukiSU/` repack tooling (`main.py` + `python/` helpers), which ships verbatim as part of that companion module.
 6. 🛑 **No Secrets or Bloat:** Never commit `.env` files, API tokens, local OS metadata (`.DS_Store`, `Thumbs.db`), Python caches (`__pycache__`), or SQLite WAL journal files.
 7. 🛑 **Attribution Integrity:**

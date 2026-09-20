@@ -175,12 +175,19 @@ EvergoTweaks/
             ├── history.db             # Raw SQLite database pulled from Geekbench 7
             ├── thermal-mgmt.txt       # Master thermal analysis & register teardown
             └── vendor_configs/        # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
+    ├── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
+    │   ├── README.md                  # Architecture, linker hooks & benchmark audit
+    │   ├── package/
+    │   │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: FrontlXOX)
+    │   └── template/                  # Hybrid ICD stack, companion libraries & SELinux scripts
     │
-    └── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
-        ├── README.md                  # Architecture, linker hooks & benchmark audit
+    └── SpatialAudio/                  # 🎧 Spatial Audio Routing & Hardware Constraint Subsystem
+        ├── README.md                  # Root-cause analysis & AudioFlinger routing fix
+        ├── patch.patch                # Standalone unified git patch for device_xiaomi_everpal
         ├── package/
-        │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: FrontlXOX)
-        └── template/                  # Hybrid ICD stack, companion libraries & SELinux scripts
+        │   └── SpatialAudio.zip       # Flashable module (Author: FrontlXOX)
+        └── docs/                      # Architectural blueprint & integration guide
+            └── spatial-audio.txt      # Master blueprint & technical specification
 ```
 
 </details>
@@ -251,6 +258,24 @@ Custom ROMs on MediaTek MT6833 suffered from outdated Vulkan 1.1 graphics stacks
 
 ---
 
+## 🎧 4. Spatial Audio Subsystem (`package/SpatialAudio/`)
+
+<details>
+<summary><b>🎧 Tap to expand Spatial Audio Routing Deep Dive & Constraint Analysis</b></summary>
+<br>
+
+- **The Problem:** On Android 16, connecting/disconnecting 3.5mm wired headsets triggered an aggressive routing storm (~20 create/releaseAudioPatch round-trips in 60s) due to unconstrained `immersive_out` mixPort concurrency, conflicting global Dolby DAP effect attachments on the spatializer thread, non-existent head-tracker discovery retry loops, and unhandled ultrasound proximity threads.
+- **The Solution:**
+  - **MixPort Concurrency Serialization:** Adds `maxOpenCount="1" maxActiveCount="1"` to `mixPort name="immersive_out"`, serializing spatializer track creation and expanding `channelMasks` to support `AUDIO_CHANNEL_OUT_5POINT1` and `AUDIO_CHANNEL_OUT_7POINT1`.
+  - **Per-Stream Postprocess Decoupling:** Relocates Dolby DAP and DVL listeners to `<postprocess>` per stream type (`music`, `ring`, `alarm`, `notification`, `voice_call`), preventing global attachment conflicts on the `AUDIO_OUTPUT_FLAG_SPATIALIZER` thread.
+  - **Hardware Constraint Realignment:** Disables speaker spatialization (`persist.vendor.audio.spatializer.speaker_enabled=false`) on the mono-class amp, halts head-tracker sensor retry loops (`ro.audio.spatializer.headtracking_supported=false`, `ro.audio.monitorRotation=false`), and disables missing ultrasound proximity modems (`ro.vendor.audio.us.proximity=false`).
+  - **Legacy Spatializer Query Fallback:** Sets `ro.audio.spatializer.use_legacy_param_query=true` to handle MTK HAL query compatibility.
+- **Details & Package:** See [`package/SpatialAudio/README.md`](./package/SpatialAudio/README.md) and [`package/SpatialAudio/package/SpatialAudio.zip`](./package/SpatialAudio/package/SpatialAudio.zip).
+
+</details>
+
+---
+
 ## 🛠️ How to Use
 
 <details>
@@ -264,7 +289,8 @@ For instant live testing without recompiling ROM images:
 1. Flash [`package/MemoryMgmt/package/MemoryMgmt.zip`](./package/MemoryMgmt/package/MemoryMgmt.zip) via your root manager.
 2. Flash [`package/ThermalMgmt/package/ThermalMgmt.zip`](./package/ThermalMgmt/package/ThermalMgmt.zip) via your root manager.
 3. Flash [`package/Vulkan13/package/Vulkan13-KernelSU.zip`](./package/Vulkan13/package/Vulkan13-KernelSU.zip) via your root manager.
-4. Reboot to activate full 2.4 GHz clocks, 55°C thermal headroom, 3.58 GB LZ4 ZRAM, and Vulkan 1.3 graphics.
+4. Flash [`package/SpatialAudio/package/SpatialAudio.zip`](./package/SpatialAudio/package/SpatialAudio.zip) via your root manager.
+5. Reboot to activate all optimizations across memory, thermals, graphics, and audio.
 
 ### Method 2: ROM Integration (Device & Vendor Trees)
 
@@ -285,6 +311,13 @@ For permanent build integration:
    ```
 
 3. In `vendor/xiaomi/everpal`: Replace `thermal-normal.conf` with `thermal-nolimits.conf`.
+
+4. **Apply Spatial Audio Patch:**
+
+   ```bash
+   cd /path/to/device_xiaomi_everpal
+   git apply /path/to/EvergoTweaks/package/SpatialAudio/patch.patch
+   ```
 
 </details>
 

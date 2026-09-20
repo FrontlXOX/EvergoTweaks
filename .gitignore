@@ -17,5 +17,5 @@ desktop.ini
 *.db-journal
 *logcat*.txt
 __pycache__/
-docs/
+/docs/
 

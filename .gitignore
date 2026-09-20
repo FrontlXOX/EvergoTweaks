@@ -1,5 +1,3 @@
-# OS Metadata
-.DS_Store
 out/
 *.tmp
 *.env
@@ -8,6 +6,7 @@ build/
 *.db-wal
 scratch/
 *.db-shm
+.DS_Store
 *.py[cod]
 convo.txt
 Thumbs.db

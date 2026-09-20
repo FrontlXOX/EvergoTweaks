@@ -30,13 +30,4 @@ chcon -h -R u:object_r:vendor_configs_file:s0 /vendor/etc/permissions/android.ha
 chcon -h -R u:object_r:vendor_configs_file:s0 /vendor/etc/permissions/android.software.vulkan*.xml 2>/dev/null
 chcon -h -R u:object_r:vendor_configs_file:s0 /vendor/etc/gralloc 2>/dev/null
 
-# Live SELinux policy injection fallback
-MAGISKPOLICY="$MODDIR/tools/magiskpolicy"
-if [ -f "$MAGISKPOLICY" ]; then
-    chmod 755 "$MAGISKPOLICY" 2>/dev/null
-    "$MAGISKPOLICY" --live "allow surfaceflinger vendor_file file { read open getattr execute map }" 2>/dev/null
-    "$MAGISKPOLICY" --live "allow surfaceflinger same_process_hal_file file { read open getattr execute map }" 2>/dev/null
-    "$MAGISKPOLICY" --live "allow appdomain vendor_file file { read open getattr execute map }" 2>/dev/null
-    "$MAGISKPOLICY" --live "allow appdomain same_process_hal_file file { read open getattr execute map }" 2>/dev/null
-fi
 

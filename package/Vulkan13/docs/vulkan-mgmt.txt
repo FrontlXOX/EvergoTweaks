@@ -52,4 +52,21 @@ Extracted from:
 --------------------------------------------------------------------------------
   - OpenGL ES 3.1: 2,736 pts (Graphics: 2,557 pts, GT1: 17.30 FPS, GT2: 8.19 FPS, Physics: 3,620 pts)
   - Vulkan: 2,734 pts (Graphics: 2,501 pts, GT1: 17.00 FPS, GT2: 7.99 FPS, Physics: 4,053 pts WORLD RECORD)
+
+6. ROM SOURCE TREE vs ROOT MODULE PACKAGING DISTINCTION
+--------------------------------------------------------------------------------
+  - ROM Source Trees (device_xiaomi_everpal & vendor_xiaomi_everpal):
+    * SEPolicy: Pure AOSP Treble compliance. Vulkan libraries are mapped to
+      'same_process_hal_file' via file_contexts. SurfaceFlinger and app domains
+      natively possess execution rights. ZERO broad 'allow ... vendor_file'
+      rules should be added to tree sepolicy, ensuring 100% CTS neverallow passes.
+    * Runtime Architecture: Single unified libged.so runtime deployed to
+      proprietary/vendor/lib64/libged.so. Both GLES and Vulkan 1.3 operate cleanly
+      under the single unified driver.
+
+  - Standalone Flashable Module (KernelSU / Magisk):
+    * SEPolicy: KernelSU's MagicMount operates via OverlayFS (dev="overlay"),
+      which strips extended security attributes and labels mounted files as
+      generic 'vendor_file' or 'unlabeled'. The bundled sepolicy.rule is injected
+      at boot by magiskpolicy strictly as a runtime shim to prevent OverlayFS AVC denials.
 ================================================================================

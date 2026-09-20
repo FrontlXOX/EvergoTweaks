@@ -39,7 +39,7 @@ def run_git(cwd: Path, *args: str) -> tuple[int, str, str]:
 
 
 def sync_tree(tree_dir: Path) -> bool:
-    """Sync a single tree directory from origin (GitHub) to gitlab (GitLab)."""
+    """Sync a single tree directory to GitHub fork (remote 'origin')."""
     name = tree_dir.name
     print(f"\n{BOLD}[*] Synchronizing: {CYAN}{name}{RESET}")
 
@@ -49,16 +49,11 @@ def sync_tree(tree_dir: Path) -> bool:
     if "origin" not in remote_list:
         print(f"    {YELLOW}[!] Skipping: 'origin' remote not found{RESET}")
         return False
-    if "gitlab" not in remote_list:
-        print(f"    {YELLOW}[!] Skipping: 'gitlab' remote not found{RESET}")
-        return False
 
-    # Fetch origin (GitHub)
-    print(f"    {CYAN}--> Fetching from upstream GitHub (origin)...{RESET}")
-    code, _, err = run_git(tree_dir, "fetch", "origin", "--prune")
-    if code != 0:
-        print(f"    {RED}[X] Fetch failed: {err}{RESET}")
-        return False
+    # Skip read-only upstream reference mirrors
+    if name in ("upstream-device", "kernel-5.10"):
+        print(f"    {CYAN}[*] Reference tree: Skipping push to upstream mirror{RESET}")
+        return True
 
     # Get current branch
     code, branch, _ = run_git(tree_dir, "rev-parse", "--abbrev-ref", "HEAD")
@@ -67,15 +62,15 @@ def sync_tree(tree_dir: Path) -> bool:
 
     print(f"    {CYAN}--> Active branch: {BOLD}{branch}{RESET}")
 
-    # Push to gitlab
-    print(f"    {CYAN}--> Pushing to GitLab (gitlab)...{RESET}")
-    code, out, err = run_git(tree_dir, "push", "gitlab", f"{branch}:{branch}")
+    # Push to origin (GitHub)
+    print(f"    {CYAN}--> Pushing to GitHub (origin)...{RESET}")
+    code, out, err = run_git(tree_dir, "push", "origin", f"{branch}:{branch}")
     if code == 0:
         msg = out or err or "Up to date"
-        print(f"    {GREEN}[✓] Successfully synced to GitLab ({msg.splitlines()[-1] if msg.splitlines() else 'OK'}){RESET}")
+        print(f"    {GREEN}[✓] Successfully synced to GitHub ({msg.splitlines()[-1] if msg.splitlines() else 'OK'}){RESET}")
         return True
     else:
-        print(f"    {RED}[X] Push to GitLab failed: {err}{RESET}")
+        print(f"    {RED}[X] Push to GitHub failed: {err}{RESET}")
         return False
 
 

@@ -17,3 +17,6 @@ desktop.ini
 *.db-journal
 *logcat*.txt
 __pycache__/
+docs/SESSION_TRANSCRIPT.md
+docs/transcript_archive.jsonl.gz
+

@@ -1,35 +1,20 @@
 # OS Metadata
 .DS_Store
-Thumbs.db
-desktop.ini
-*.tmp
-.vscode/
-
-# Python bytecode & caches
-__pycache__/
-*.py[cod]
-*$py.class
-*.env
-
-# SQLite WAL & Journal files
-*.db-wal
-*.db-shm
-*.db-journal
-
-# Logs & temporary captures
-*.log
-*logcat*.txt
-
-# GitNexus local analyzer cache & AST store
-.gitnexus/
-
-# Collaborator communication staging buffer
-convo.txt
-
-# Local build and scratch caches
-build/
 out/
+*.tmp
+*.env
+*.log
+build/
+*.db-wal
 scratch/
-extracted_gold/
-gold_images*/
+*.db-shm
+*.py[cod]
+convo.txt
+Thumbs.db
+*$py.class
+.gitnexus/
 Garuda.txt
+desktop.ini
+*.db-journal
+*logcat*.txt
+__pycache__/

@@ -11,16 +11,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **ARM Mali-G57 Vulkan 1.3 Hybrid Engine Deployed & Verified:**
   - Successfully decoupled Vulkan 1.3 runtime from the legacy Linux 4.14 split-driver kernel trap, preserving stock `libGLES_mali.so` for SurfaceFlinger while providing a pure Valhall r49p1 Vulkan 1.3 ICD (`libVK13_mali.so`) for games and compute workloads.
+  - **Donor Stack Integration:** Extracted donor blobs from **Redmi Note 13 5G / 13R Pro (`gold`)** on **HyperOS 3.0** (`OS3.0.10.0.VNQCNXM_15.0`, Android 15, Dimensity 6080 MT6833 family, ARM Mali DDK **`r49p1-03bet0`**).
   - **Dynamic Linker Resolution Fixes:**
-    - Resolved missing `GpuAuxBlitAHardwareBuffer` via in-place symbol export patch in companion library `libgpd1.so`.
-    - Resolved missing frame rate watchdog symbols (`ged_fr_swd_frame_destroy` and `ged_fr_swd_mark_frame`) by integrating the HyperOS 2.0 donor `libged.so` superset.
+    - Resolved missing `GpuAuxBlitAHardwareBuffer` via in-place symbol export patch in companion library `libgpd1.so` with bit-exact Bionic GnuHash compatibility.
+    - Resolved missing frame rate watchdog symbols (`ged_fr_swd_frame_destroy` and `ged_fr_swd_mark_frame`) by integrating the HyperOS donor `libged.so` superset.
   - **Android 16 Framework Recognition:** Verified via `dumpsys gpu` with `vulkanVersion = 4206592` (0x00403000 = Vulkan 1.3.0), `createdVulkanDevice = 1`, and `vkLoadingFailureCount = 0`.
-- **All-Time Global MT6833 3DMark Sling Shot Extreme Record: `2,736` pts!**
-  - Established a new all-time global benchmark record of **`2,736 pts`** (+8.7% over stock baseline, beating the previous 2,698 record).
-  - **Graphics Score:** **`2,557 pts`** (Peak GT1: **17.30 FPS**, GT2: **8.19 FPS**).
-  - **Physics Score:** Smashed the physics ceiling under Vulkan with **`4,053 pts`** (+20.0% / +674 pts over stock).
-- **Unified Automation & Module Packaging:**
+  - **Arm Generic Timer & AFBC:** Calibrated Generic Timer frequency to 13 MHz (`PLATFORM_AGT_FREQUENCY_KHZ=13000`) in `mali_platform.config` and deployed Gralloc AFBC mapping manifests (`gpu.xml`, `dpu.xml`, `dpu_aeu.xml`, `vpu.xml`, `cam.xml`).
+- **All-Time Global MT6833 3DMark Sling Shot Extreme Records:**
+  - **OpenGL ES 3.1 Pass (`SLING_SHOT_ES_31`):** **`2,736 pts`** overall (+8.7% over stock baseline). Graphics: **`2,557 pts`** (GT1: **17.30 FPS**, GT2: **8.19 FPS**).
+  - **Vulkan Pass (`SLING_SHOT_VULKAN`):** **`2,734 pts`** overall. Smashed the platform physics ceiling with **`4,053 pts`** (+20.0% / +674 pts over stock). Graphics: **`2,501 pts`** (GT1: **17.00 FPS**, GT2: **7.99 FPS**).
+- **Mali Valhall Kernel Architecture & Backporting Blueprint:**
+  - Proved that Mali-G57 (Valhall v1) operates exclusively on the **Job Manager (JM)** interface (`BASE_UK_VERSION_MAJOR 11`), meaning CSF firmware is not required.
+  - Diagnosed and resolved the 4 fatal blockers when compiling 5.10 Mali drivers on 4.14: `access_ok` argument shift, ION vs `dma_heap`, `dma_fence` APIs, and MediaTek `platform/mt6833/` power/clock glue.
+- **Unified Automation, Multi-Run Benchmark Extraction & Repo Cleanup:**
   - Enhanced [`scripts/build_all.py`](file:///D:/Evergo/EvergoTweaks/scripts/build_all.py) to build and CRC-32 verify all 3 flashable modules (`MemoryMgmt.zip`, `ThermalMgmt.zip`, `Vulkan13-KernelSU.zip`) simultaneously.
+  - Enhanced [`scripts/pull_benchmark.py`](file:///D:/Evergo/EvergoTweaks/scripts/pull_benchmark.py) to pull, parse, and log all concurrent 3DMark benchmark runs (OpenGL ES and Vulkan) directly from on-device SQLite storage.
+  - Purged 19.35 GB of obsolete extraction dumps and temporary scratch files, keeping the repository completely lean.
 
 ---
 

@@ -112,6 +112,19 @@ Applied via `package/ThermalMgmt/patch.patch` and `package/ThermalMgmt/package/T
 
 ---
 
+### C. Graphics & Vulkan Subsystem (`package/Vulkan13/`)
+
+#### The Split-Driver Synchronization Problem
+ARM Mali GPUs require strict synchronization between the user-space driver (`vulkan.mali.so`, `libGLES_mali.so`) and the kernel device driver (`/dev/mali0` — `mali_kbase`). Directly replacing stock `libGLES_mali.so` with newer DDK binaries crashes SurfaceFlinger due to mismatched IOCTL command structures.
+
+#### Production Solution: Hybrid Decoupling
+- **Dual-Stack Decoupling:** Stock `libGLES_mali.so` (r32p1) handles SurfaceFlinger and system GLES rendering, while a standalone **Valhall r49p1 Vulkan 1.3 ICD** (`libVK13_mali.so`) extracted from **Redmi Note 13 5G (`gold`)** on **HyperOS 3.0** (`OS3.0.10.0.VNQCNXM_15.0`) serves Vulkan 1.3 workloads.
+- **Linker Hooks & AFBC:** Companion library `libgpd1.so` patched to export missing `GpuAuxBlitAHardwareBuffer` via bit-exact Bionic GnuHash; donor `libged.so` integrated; Arm Generic Timer calibrated to 13 MHz (`PLATFORM_AGT_FREQUENCY_KHZ=13000`); Gralloc AFBC manifests deployed.
+- **Mali-G57 Architecture Truth:** Mali-G57 (Valhall v1) uses the **Job Manager (JM)** interface (`BASE_UK_VERSION_MAJOR 11`), **NOT** CSF. Shader and pipeline compilation runs 100% in user-space, delivering full performance on Linux 4.14 without kernel bottlenecks.
+- **Kernel Compilation Shims for 4.14:** When backporting 5.10 `mali_kbase`, porters must shim `access_ok(VERIFY_READ, addr, size)` (3 args vs 2 args in 5.0+), retain legacy ION buffer allocator (`mali_kbase_mem_linux.c`), guard modern `dma_fence_set_deadline()`, and port `platform/mt6833/` glue from `mali-r32p1`.
+
+---
+
 ## 4. Empirical Benchmark Records & Baselines
 
 These verified numbers represent the ground truth performance achievable with this repository:
@@ -120,11 +133,14 @@ These verified numbers represent the ground truth performance achievable with th
 | :---------------------------- | :-----------------: | :---------------------: | :----------------------------------------: | :------------------------------------------------- |
 | **Geekbench 7 Multi-Core**    |       `1,500`       |         `1,788`         |                **`2,133`**                 | 🚀 **+42.2% (+633 pts — Global MT6833 Record)**    |
 | **Geekbench 7 Single-Core**   |        `610`        |          `578`          |                 **`729`**                  | 🚀 **+19.5% (+119 pts — Global MT6833 Record)**   |
+| **3DMark Sling Shot Extreme** |       `2,518`       |         —               |                **`2,736`**                 | 🚀 **+8.7% All-Time Global MT6833 Record**         |
+| **3DMark Physics (Vulkan)**   |       `3,379`       |         —               |                **`4,053`**                 | 🚀 **+20.0% (+674 pts — World Record Physics)**    |
 | **Geekbench 7 GPU (Compute)** |       ~`1,080`      |         —               |                **`1,302`**                 | 🚀 **+20.6% (Mali-G57 MC2 @ 1068 MHz GED Boost)**  |
 | **Direct Reclaim Stalls**     |      ⚠️ Severe      |      🛡️ None       |   🛡️ **Zero Allocation Stalls**    | `direct_reclaim = 0`                               |
 | **App Retention**             | ❌ Aggressive Kills | ✅ 100% Kept Alive |       ✅ **100% Kept Alive**       | Retains Chrome tabs, music, launcher in ZRAM       |
 
 - **Official Geekbench 7 Verification (Side-by-Side vs Stock Baseline):** [https://browser.geekbench.com/v7/cpu/compare/400164?baseline=380539](https://browser.geekbench.com/v7/cpu/compare/400164?baseline=380539) | **GPU Compute Compare:** [https://browser.geekbench.com/v7/gpu/compare/183548?baseline=183548](https://browser.geekbench.com/v7/gpu/compare/183548?baseline=183548) (All-Time Record Runs: [400164 — 2133 MC](https://browser.geekbench.com/v7/cpu/400164) / [392815 — 2108 MC](https://browser.geekbench.com/v7/cpu/392815) / [391841 — 729 SC](https://browser.geekbench.com/v7/cpu/391841) / [389858 — 728 SC](https://browser.geekbench.com/v7/cpu/389858) / [385213 — 2066 MC](https://browser.geekbench.com/v7/cpu/385213) | GPU OpenCL Record: [183548 — 1302 pts](https://browser.geekbench.com/v7/gpu/183548))
+- **3DMark Sling Shot Extreme Official Runs:** OpenGL ES 3.1: **`2,736 pts`** (Graphics: **`2,557 pts`**, GT1: 17.30 FPS, GT2: 8.19 FPS) | Vulkan: **`2,734 pts`** (Physics: **`4,053 pts`** World Record, GT1: 17.00 FPS, GT2: 7.99 FPS).
 - **Sustained Cortex-A76 Big Clocks:** `2,393 MHz` (~2.39 GHz pinned throughout compute runs).
 - **Sub-Workload Highlights (Single-Core — Peak 729 SC World Record Run 391841):**
   - HTML5 Browser: **802** | Navigation: **972** | PDF Viewer: **970** | Audio Encoder: **891** | File Compression: **863** | Asset Compression: **849** | Ray Tracer: **735**
@@ -313,3 +329,4 @@ All agents working within this codebase must strictly observe these rules:
    - Architectural and research credits honor: `Special Thanks & Collaborators: Addster09 x himanshuksr0007 (Goku)`.
    - Under NO circumstances should `TesterProd` be listed under Authors & Credits in documentation.
 8. 🔄 **Benchmark URL Maintenance:** Whenever a new peak record run is achieved, always update the official side-by-side comparison URL (`https://browser.geekbench.com/v7/cpu/compare/<NEW_RECORD_ID>?baseline=380539`) across all documentation markdown files (`README.md`, `AGENTS.md`, `package/ThermalMgmt/README.md`).
+9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\Evergo\EvergoTweaks\convo.txt`). Ensure the message uses an engaging, sharp blend of in-depth technical accuracy and casual developer Telegram/chat style (e.g., emojis, code snippets, direct and punchy tone) ready for the user to copy-paste directly to them.

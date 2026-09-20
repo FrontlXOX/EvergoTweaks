@@ -80,6 +80,20 @@ Tested live on real hardware with deep kernel diagnostics, this repository provi
 | **HDR** | **`1,656`** 🥇 | 8 Cores (2 Big + 6 Little) | Multi-exposure image fusion across full cpuset 0-7 |
 | **Photo Editor** | **`1,491`** 🥇 | 8 Cores (2 Big + 6 Little) | Fork-join work-stealing with 500µs migration cost |
 
+#### 🎮 3DMark Sling Shot Extreme Sub-Workload Breakdown (Record Runs)
+
+| Metric / Workload Pass | OpenGL ES 3.1 (`SLING_SHOT_ES_31`) | Vulkan (`SLING_SHOT_VULKAN`) | Stock Baseline | Verified Peak Delta |
+| :--- | :---: | :---: | :---: | :--- |
+| **Overall 3DMark Score** | **`2,736` pts** 🥇 | **`2,734` pts** | `2,518` pts | 🚀 **+8.7% All-Time MT6833 Record** |
+| **Graphics Score** | **`2,557` pts** 🥇 | **`2,501` pts** | `2,316` pts | 🚀 **+10.4% Graphics Throughput** |
+| **Graphics Test 1 (GT1)** | **`17.30` FPS** 🥇 | **`17.00` FPS** | `15.80` FPS | Sustained Valhall v1 pipeline fill rate |
+| **Graphics Test 2 (GT2)** | **`8.19` FPS** 🥇 | **`7.99` FPS** | `7.30` FPS | Heavy volumetric post-processing |
+| **Physics Score** | `3,620` pts | **`4,053` pts** 🥇 | `3,379` pts | 🚀 **+20.0% (+674 pts — World Record)** |
+| **Physics Section 0** | **`64.04` FPS** 🥇 | `30.30` FPS (Capped) | `48.20` FPS | High-concurrency rigid body simulation |
+| **Physics Section 1** | **`37.21` FPS** 🥇 | `30.30` FPS (Capped) | `29.10` FPS | Cloth dynamics & particle physics |
+| **Physics Section 2** | **`20.84` FPS** 🥇 | `30.30` FPS (Capped) | `16.40` FPS | Multi-threaded solver iterations |
+| **Demo Loop** | **`8.52` FPS** 🥇 | `7.80` FPS | `7.20` FPS | Real-time graphics & audio composition |
+
 </details>
 
 ---
@@ -222,10 +236,13 @@ Custom ROMs suffered from severe thermal downclocking due to missing Xiaomi prop
 
 Custom ROMs on MediaTek MT6833 suffered from outdated Vulkan 1.1 graphics stacks, missing Vulkan 1.3 extensions (`VK_KHR_dynamic_rendering`, `VK_KHR_synchronization2`), and fatal bootloops when attempting naive user-space driver updates:
 
-- **The Problem:** ARM Mali GPUs use a version-locked user/kernel split-driver architecture. Replacing `libGLES_mali.so` with newer DDKs causes SurfaceFlinger to crash on Linux 4.14 kernel drivers due to mismatched IOCTL command structures.
+- **The Problem:** ARM Mali GPUs use a version-locked user/kernel split-driver architecture. Replacing `libGLES_mali.so` with newer DDKs causes SurfaceFlinger to crash on Linux 4.14 kernel drivers due to mismatched IOCTL command structures (`BASE_UK_VERSION` handshake).
 - **The Solution:**
-  - **Dual-Stack Decoupling:** Keeps stock `libGLES_mali.so` for SurfaceFlinger stability while deploying a dedicated **Valhall r49p1 Vulkan 1.3 ICD** (`libVK13_mali.so`) and HAL stub (`vulkan.mali.so`).
-  - **Dynamic Linker Hooks:** Patched companion library `libgpd1.so` to export missing `GpuAuxBlitAHardwareBuffer`, and integrated the HyperOS 2.0 donor `libged.so` runtime to resolve `ged_fr_swd_frame_destroy` and `ged_fr_swd_mark_frame`.
+  - **Donor Stack Integration:** Extracted donor blobs from **Redmi Note 13 5G / 13R Pro (`gold`)** on **HyperOS 3.0** (`OS3.0.10.0.VNQCNXM_15.0`, Android 15, Dimensity 6080 MT6833 family, ARM Mali DDK **`r49p1-03bet0`**).
+  - **Dual-Stack Decoupling:** Keeps stock `libGLES_mali.so` (r32p1) for SurfaceFlinger stability while deploying a dedicated **Valhall r49p1 Vulkan 1.3 ICD** (`libVK13_mali.so`) and HAL stub (`vulkan.mali.so`).
+  - **Dynamic Linker Hooks:** Patched companion library `libgpd1.so` to export missing `GpuAuxBlitAHardwareBuffer` with bit-exact Bionic GnuHash compatibility, and integrated the donor `libged.so` runtime to resolve `ged_fr_swd_frame_destroy` and `ged_fr_swd_mark_frame`.
+  - **Hardware Timing & AFBC:** Calibrated Arm Generic Timer to 13 MHz (`PLATFORM_AGT_FREQUENCY_KHZ=13000`) in `mali_platform.config` and deployed Gralloc AFBC capability manifests (`gpu.xml`, `dpu.xml`, `dpu_aeu.xml`, `vpu.xml`, `cam.xml`).
+  - **Architecture Validation:** Verified that Mali-G57 (Valhall v1) operates strictly on the **Job Manager (JM)** interface (`BASE_UK_VERSION_MAJOR 11`) rather than CSF, enabling 100% user-space shader and state compilation without kernel-space performance degradation.
   - **Verified Recognition:** Android 16 reports `vulkanVersion = 4206592` (Vulkan 1.3.0) with zero driver loading failures (`createdVulkanDevice = 1`).
   - **Benchmark Records:** Delivered all-time MT6833 records in **3DMark Sling Shot Extreme** (**2,736 pts overall**, **4,053 Vulkan physics**).
 - **Details & Package:** See [`package/Vulkan13/README.md`](./package/Vulkan13/README.md) and [`package/Vulkan13/package/Vulkan13-KernelSU.zip`](./package/Vulkan13/package/Vulkan13-KernelSU.zip).

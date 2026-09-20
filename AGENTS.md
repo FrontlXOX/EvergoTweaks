@@ -177,7 +177,7 @@ These verified numbers represent the ground truth performance achievable with th
 
 ## 5. Repository Layout & File Catalog
 
-All required automation and operational Python scripts reside **exclusively** in the root `src/scripts/` directory:
+All required automation and operational Python/Bash scripts reside **exclusively** in `src/scripts/`:
 
 ```text
 EverpalTweaks/
@@ -187,65 +187,67 @@ EverpalTweaks/
 ├── LICENSE                            # Apache 2.0 License
 ├── .gitignore                         # Build outputs, temporary files, and platform artifacts
 │
-├── scripts/                           # 🛠️ Centralized Repository Automation Tooling (Root-Only)
-│   ├── autobench.py                   # Automated Geekbench 7 (CPU + GPU Vulkan) suite with real-time CLI telemetry
-│   ├── benchpull.py                   # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
-│   ├── builder.py                     # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan, --spatial)
-│   ├── decrypt_thermal.py             # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
-│   ├── synctrees.py                   # Automated tree synchronizer for GitHub (FrontlXOX)
-│   └── verifydevice.py                # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
-│
-├── trees/                             # 🌲 Submodule Forks on GitHub (FrontlXOX)
-│   ├── device_xiaomi_everpal/         # FrontlXOX device tree (lineage-23.2)
-│   ├── kernel/                        # FrontlXOX Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
-│   ├── kernel-5.10/                   # MediaTek 5.10 GKI donor kernel (vic, mt6789/mt6833 sibling)
-│   ├── upstream-device/               # xiaomi-mt6833-dev reference tree (vulkan-1.3)
-│   └── vendor_xiaomi_everpal/         # FrontlXOX vendor blobs (vulkan-1.3, lineage-23.2)
-│
-├── modules/                           # 📲 Third-Party Companion Modules (Sanctioned Rule 4 Exception)
-│   ├── *.zip                          # Curated flashable companions (ZygiskNext, LSPosed, ViPER, HideNavBar, etc.)
-│   └── ResukiSU/                      # ReSukiSU repack tooling (main.py + python/ avb/mkbootimg helpers)
-│
-└── package/                           # 📦 Flashable Subsystems & Packaging Assets
-    ├── templates/                     # Shared Magisk, KernelSU & AnyKernel3 packaging templates
-    │   ├── AnyKernel3/                # Base AnyKernel3 flashable zip packaging assets
-    │   ├── META-INF/                  # Generic Magisk update-binary stubs
-    │   └── Vulkan13/                  # Hybrid ICD stack, companion libraries & SELinux scripts
+└── src/
+    ├── scripts/                       # 🛠️ Centralized Repository Automation Tooling
+    │   ├── autobench.py               # Automated Geekbench 7 (CPU + GPU Vulkan) suite with real-time CLI telemetry
+    │   ├── benchpull.py               # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
+    │   ├── build_kernel.sh            # ZorinOS integrated builder: Aqua kernel + optional Vulkan 1.3 overlay combo zip
+    │   ├── builder.py                 # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan, --spatial)
+    │   ├── decrypt_thermal.py         # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
+    │   ├── synctrees.py               # Automated tree synchronizer for GitHub (FrontlXOX)
+    │   └── verifydevice.py            # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
     │
-    ├── MemoryMgmt/                    # 🧠 RAM & LMKD Architecture Subsystem
-    │   ├── README.md                  # Comprehensive technical manual & QA zone math audit
-    │   ├── patch.patch                # Unified diff for device_xiaomi_everpal
-    │   ├── package/
-    │   │   └── MemoryMgmt.zip         # Flashable module (Author: FrontlXOX)
-    │   └── docs/                      # Architectural blueprint & integration guide
-    │       └── memory-mgmt.txt        # Master blueprint, LMKD tuning logic & git diffs
+    ├── trees/                         # 🌲 Submodule Forks on GitHub (FrontlXOX)
+    │   ├── device_xiaomi_everpal/     # FrontlXOX device tree (lineage-23.2)
+    │   ├── kernel/                    # FrontlXOX Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
+    │   ├── kernel-5.10/               # MediaTek 5.10 GKI donor kernel (vic, mt6789/mt6833 sibling)
+    │   ├── upstream-device/           # xiaomi-mt6833-dev reference tree (vulkan-1.3)
+    │   └── vendor_xiaomi_everpal/     # FrontlXOX vendor blobs (vulkan-1.3, lineage-23.2)
     │
-    ├── ThermalMgmt/                   # 🔥 Thermal Mitigation & mi_thermald Subsystem
-    │   ├── README.md                  # Hardware audit, decrypted Xiaomi profiles & profile tables
-    │   ├── patch.patch                # Unified diff for device and vendor trees
-    │   ├── package/
-    │   │   └── ThermalMgmt.zip        # Flashable module (Author: FrontlXOX)
-    │   └── docs/                      # Benchmark logs, databases & vendor configs
-    │       ├── benchmark_history.txt     # Chronological benchmark log
-    │       ├── fm_local_results.db       # Raw SQLite database from 3DMark Sling Shot Extreme
-    │       ├── history.db                # Raw SQLite database pulled from Geekbench 7
-    │       ├── thermal-mgmt.txt          # Master thermal analysis & register teardown
-    │       └── vendor_configs/           # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
-    ├── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
-    │   ├── README.md                  # Hardware audit, linker hooks & benchmark records
-    │   ├── patch.patch                # Unified diff for device and vendor trees
-    │   ├── package/
-    │   │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: FrontlXOX)
-    │   └── docs/                      # Architectural blueprint & vendor configuration guide
-    │       └── vulkan-mgmt.txt        # Master Vulkan 1.3 hybrid architecture document
+    ├── modules/                       # 📲 Third-Party Companion Modules (Sanctioned Rule 4 Exception)
+    │   ├── *.zip                      # Curated flashable companions (ZygiskNext, LSPosed, ViPER, HideNavBar, etc.)
+    │   └── ResukiSU/                  # ReSukiSU repack tooling (main.py + python/ avb/mkbootimg helpers)
     │
-    └── SpatialAudio/                  # 🎧 Spatial Audio Routing & Hardware Constraint Subsystem
-        ├── README.md                  # Hardware audit, routing cascade analysis & HAL tunables
-        ├── patch.patch                # Unified diff for device_xiaomi_everpal
-        ├── package/
-        │   └── SpatialAudio.zip       # Flashable module (Author: FrontlXOX)
-        └── docs/                      # Architectural blueprint & technical breakdown
-            └── spatial-audio.txt      # Master spatial audio routing document
+    └── package/                       # 📦 Flashable Subsystems & Packaging Assets
+        ├── templates/                 # Shared Magisk, KernelSU & AnyKernel3 packaging templates
+        │   ├── AnyKernel3/            # Base AnyKernel3 flashable zip packaging assets
+        │   ├── META-INF/              # Generic Magisk update-binary stubs
+        │   └── Vulkan13/              # Hybrid ICD stack, companion libraries & SELinux scripts
+        │
+        ├── MemoryMgmt/                # 🧠 RAM & LMKD Architecture Subsystem
+        │   ├── README.md              # Comprehensive technical manual & QA zone math audit
+        │   ├── patch.patch            # Unified diff for device_xiaomi_everpal
+        │   ├── package/
+        │   │   └── MemoryMgmt.zip     # Flashable module (Author: FrontlXOX)
+        │   └── docs/                  # Architectural blueprint & integration guide
+        │       └── memory-mgmt.txt    # Master blueprint, LMKD tuning logic & git diffs
+        │
+        ├── ThermalMgmt/               # 🔥 Thermal Mitigation & mi_thermald Subsystem
+        │   ├── README.md              # Hardware audit, decrypted Xiaomi profiles & profile tables
+        │   ├── patch.patch            # Unified diff for device and vendor trees
+        │   ├── package/
+        │   │   └── ThermalMgmt.zip    # Flashable module (Author: FrontlXOX)
+        │   └── docs/                  # Benchmark logs, databases & vendor configs
+        │       ├── benchmark_history.txt     # Chronological benchmark log
+        │       ├── fm_local_results.db       # Raw SQLite database from 3DMark Sling Shot Extreme
+        │       ├── history.db                # Raw SQLite database pulled from Geekbench 7
+        │       ├── thermal-mgmt.txt          # Master thermal analysis & register teardown
+        │       └── vendor_configs/           # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
+        ├── Vulkan13/                  # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
+        │   ├── README.md              # Hardware audit, linker hooks & benchmark records
+        │   ├── patch.patch            # Unified diff for device and vendor trees
+        │   ├── package/
+        │   │   └── Vulkan13-KernelSU.zip  # Flashable module — overlay-only OR kernel+overlay combo (Author: FrontlXOX)
+        │   └── docs/                  # Architectural blueprint & vendor configuration guide
+        │       └── vulkan-mgmt.txt    # Master Vulkan 1.3 hybrid architecture document
+        │
+        └── SpatialAudio/             # 🎧 Spatial Audio Routing & Hardware Constraint Subsystem
+            ├── README.md             # Hardware audit, routing cascade analysis & HAL tunables
+            ├── patch.patch           # Unified diff for device_xiaomi_everpal
+            ├── package/
+            │   └── SpatialAudio.zip  # Flashable module (Author: FrontlXOX)
+            └── docs/                 # Architectural blueprint & technical breakdown
+                └── spatial-audio.txt # Master spatial audio routing document
 ```
 
 ---
@@ -270,6 +272,52 @@ python src/scripts/builder.py --spatial
 ```
 
 _Note: Flashable zips are always written exclusively to `src/package/<Module>/package/`._
+
+### Building the Aqua Kernel (ZorinOS / Ubuntu)
+
+**Prerequisites** (one-time setup on ZorinOS):
+
+```bash
+sudo apt install -y build-essential bc bison flex libssl-dev libelf-dev \
+    python3 ccache aarch64-linux-gnu-gcc arm-linux-gnueabi-gcc
+```
+
+ZyC Clang 22 is auto-downloaded to `~/toolchains/ZyC-clang-22.0.0` on first run.
+
+**Kernel-only zip** (AquaKernel-\<date\>.zip via Addster09's AnyKernel3):
+
+```bash
+bash src/scripts/build_kernel.sh
+```
+
+**Kernel + Vulkan 1.3 overlay combo zip** (single `Vulkan13-KernelSU.zip`):
+
+```bash
+bash src/scripts/build_kernel.sh --vulkan
+```
+
+**With KernelSU + SUSFS patches baked in:**
+
+```bash
+bash src/scripts/build_kernel.sh --vulkan --with-ksu
+```
+
+**Clean build (wipe `out/` first):**
+
+```bash
+bash src/scripts/build_kernel.sh --vulkan --clean
+```
+
+_Output: `src/package/Vulkan13/package/Vulkan13-KernelSU.zip` — flash via KernelSU Manager or recovery._
+
+**Injecting a pre-built kernel into the Vulkan module** (without running a full build):
+
+```bash
+python src/scripts/builder.py --vulkan \
+    --kernel path/to/Image.gz \
+    --dtbo path/to/dtbo.img
+```
+
 
 ### Auditing Connected Device via ADB
 
@@ -321,13 +369,13 @@ python src/scripts/benchpull.py
 Sync all submodules directly into GitHub forks using the automated synchronizer:
 
 ```bash
-python src/src/scripts/synctrees.py
+python src/scripts/synctrees.py
 ```
 
 Or via PowerShell:
 
 ```powershell
-Get-ChildItem -Directory trees | ForEach-Object {
+Get-ChildItem -Directory src/trees | ForEach-Object {
     git -C $_.FullName push origin
 }
 ```

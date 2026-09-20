@@ -30,21 +30,21 @@ This repository maintains two production-grade subsystems:
 
 ## 2. Hardware & Operating System Specifications
 
-| Component             | Technical Specification                                                       |
-| :-------------------- | :---------------------------------------------------------------------------- |
-| **Commercial Device** | Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G                                     |
-| **Model Number**      | `Xiaomi 22031116AI` (Board: `everpal`, Board ID: `S98016LA1`, SKU: `India`)   |
-| **Platform / SoC**    | MediaTek Dimensity 810 5G (MT6833P / MT6833 family, TSMC 6nm process)         |
-| **CPU Topology**      | Octa-core: 2x Cortex-A76 @ 2.40 GHz (Big) + 6x Cortex-A55 @ 2.00 GHz (LITTLE) |
-| **GPU Architecture**  | ARM Mali-G57 MC2 @ 950 MHz - 1068 MHz (Valhall v1, 2 Shader Cores)            |
+| Component             | Technical Specification                                                                  |
+| :-------------------- | :--------------------------------------------------------------------------------------- |
+| **Commercial Device** | Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G                                                |
+| **Model Number**      | `Xiaomi 22031116AI` (Board: `everpal`, Board ID: `S98016LA1`, SKU: `India`)              |
+| **Platform / SoC**    | MediaTek Dimensity 810 5G (MT6833P / MT6833 family, TSMC 6nm process)                    |
+| **CPU Topology**      | Octa-core: 2x Cortex-A76 @ 2.40 GHz (Big) + 6x Cortex-A55 @ 2.00 GHz (LITTLE)            |
+| **GPU Architecture**  | ARM Mali-G57 MC2 @ 950 MHz - 1068 MHz (Valhall v1, 2 Shader Cores)                       |
 | **Physical Memory**   | 4.00 GB LPDDR4X (Samsung KM5P9001DM-B424 uMCP, Kernel MemTotal: ~3.53 GB / 3,709,888 kB) |
-| **Internal Storage**  | 64 GB UFS 2.2 (Samsung KM5P9001DM-B424 uMCP, ~48 GB User Data Partition)     |
-| **Display Panel**     | 6.6" 90Hz FHD+ IPS LCD (1080 x 2400, 399 PPI, 11-bit PWM brightness 0-2047, KTZ8863A) |
-| **Operating System**  | Android 16 (Project Infinity - LineageOS 23.0 Base)                           |
-| **Android Build ID**  | `BP4A.251205.006 release-keys` (`eng.androi.20260917.074937`)                 |
-| **Security Patch**    | September 1, 2026                                                             |
-| **Kernel Version**    | Linux `4.14.357-Aqua #3 SMP PREEMPT` (AArch64, Android Clang 18)              |
-| **Root Environment**  | KernelSU (`ksud 4.2.0-rc1` / v1.0.5) + Zygisk / SELinux Enforcing             |
+| **Internal Storage**  | 64 GB UFS 2.2 (Samsung KM5P9001DM-B424 uMCP, ~48 GB User Data Partition)                 |
+| **Display Panel**     | 6.6" 90Hz FHD+ IPS LCD (1080 x 2400, 399 PPI, 11-bit PWM brightness 0-2047, KTZ8863A)    |
+| **Operating System**  | Android 16 (Project Infinity - LineageOS 23.0 Base)                                      |
+| **Android Build ID**  | `BP4A.251205.006 release-keys` (`eng.androi.20260917.074937`)                            |
+| **Security Patch**    | September 1, 2026                                                                        |
+| **Kernel Version**    | Linux `4.14.357-Aqua #3 SMP PREEMPT` (AArch64, Android Clang 18)                         |
+| **Root Environment**  | KernelSU (`ksud 4.2.0-rc1` / v1.0.5) + Zygisk / SELinux Enforcing                        |
 
 ---
 
@@ -59,12 +59,13 @@ On the 4GB MT6833/MT6833P architecture, physical RAM is segmented into three ker
 1. `Zone DMA`: ~2,670 MB managed (683,696 pages, general DMA & bulk user memory)
 2. `Zone Normal`: **~374.00 MiB managed** (95,744 pages) | **432.00 MiB spanned** (110,592 pages / 442.37 MB decimal)
 3. `Zone Movable` (CMA): ~578 MB managed (148,032 pages reserved for camera/multimedia allocations)
-*Total managed: 927,472 pages (3,709,888 kB / ~3.53 GB Linux MemTotal from 4GB physical LPDDR4X).*
+   _Total managed: 927,472 pages (3,709,888 kB / ~3.53 GB Linux MemTotal from 4GB physical LPDDR4X)._
 
-> **Mathematical Distinction:**  
-> - **Spanned Range:** `110,592 pages` = `442,368 KB` = **`432.00 MiB`** (binary) / **`442.37 MB`** (decimal).  
-> - **Managed Pages:** `95,744 pages` = `382,976 KB` = **`374.00 MiB`** (binary) / **`382.98 MB`** (decimal).  
-> Previous diagnostic references cited either the total physical spanned space (~442MB) or post-reservation managed pages (~374MB).
+> **Mathematical Distinction:**
+>
+> - **Spanned Range:** `110,592 pages` = `442,368 KB` = **`432.00 MiB`** (binary) / **`442.37 MB`** (decimal).
+> - **Managed Pages:** `95,744 pages` = `382,976 KB` = **`374.00 MiB`** (binary) / **`382.98 MB`** (decimal).
+>   Previous diagnostic references cited either the total physical spanned space (~442MB) or post-reservation managed pages (~374MB).
 
 **The Failure Mechanism:** Default AOSP configurations utilize high watermark multipliers (`watermark_scale_factor = 100` to `200`). Because `Zone Normal` is physically restricted to only ~374 MiB managed, inflated watermarks force `Zone Normal` into persistent `low watermark is breached` states under moderate app loading—even when `Zone DMA` has over 850 MB of completely free, unfragmented physical RAM. This triggers Android 16's Low Memory Killer Daemon (`lmkd`) to aggressively kill background launchers, media players, and browser processes.
 
@@ -97,7 +98,7 @@ Xiaomi MT6833 stock firmware relies on `mi_thermald` interacting with a propriet
 Applied via `package/ThermalMgmt/patch.patch` and `package/ThermalMgmt/package/ThermalMgmt.zip`:
 
 - Enforces `sconfig 10` (`thermal-mgame.conf` / `thermal-nolimits.conf`), shifting the thermal throttling ceiling from **36°C to 55°C**.
-- Below 55°C, thermal governor applies zero throttling, allowing Cortex-A76 Big Cores to pin at sustained **2.40 GHz** and Cortex-A55 to pin at **2.00 GHz**. The `862000` / `898000` kHz targets in `thermal-nolimits.conf` represent the safety floor *only if* temperatures breach 55°C.
+- Below 55°C, thermal governor applies zero throttling, allowing Cortex-A76 Big Cores to pin at sustained **2.40 GHz** and Cortex-A55 to pin at **2.00 GHz**. The `862000` / `898000` kHz targets in `thermal-nolimits.conf` represent the safety floor _only if_ temperatures breach 55°C.
 - Enforces and hardware-locks CoreLink CCI Perf mode at **1.60 GHz** (OPP 0) via `chmod 444`, preventing non-root Android Power HAL (`android.hardware.power-service.mediatek`) from downgrading interconnect and L3 cache bandwidth.
 - Hardware-locks ARM Mali-G57 MC2 DVFS evaluation period to **50ms** (via `chmod 444`) with `always_on` power policy and MediaTek GED GPU acceleration up to 1.068 GHz.
 - Eliminates CPU Schedutil ramp latency (`up_rate_limit_us = 0`), unlocks both Big cores for foreground (`cpuset 0-7`), configures BORE big task rotation, and preserves natural 8-core DynamIQ task distribution across all 6 Little cores and 2 Big cores.
@@ -115,9 +116,11 @@ Applied via `package/ThermalMgmt/patch.patch` and `package/ThermalMgmt/package/T
 ### C. Graphics & Vulkan Subsystem (`package/Vulkan13/`)
 
 #### The Split-Driver Synchronization Problem
+
 ARM Mali GPUs require strict synchronization between the user-space driver (`vulkan.mali.so`, `libGLES_mali.so`) and the kernel device driver (`/dev/mali0` — `mali_kbase`). Directly replacing stock `libGLES_mali.so` with newer DDK binaries crashes SurfaceFlinger due to mismatched IOCTL command structures.
 
 #### Production Solution: Hybrid Decoupling
+
 - **Dual-Stack Decoupling:** Stock `libGLES_mali.so` (r32p1) handles SurfaceFlinger and system GLES rendering, while a standalone **Valhall r49p1 Vulkan 1.3 ICD** (`libVK13_mali.so`) extracted from **Redmi Note 13 5G (`gold`)** on **HyperOS 3.0** (`OS3.0.10.0.VNQCNXM_15.0`) serves Vulkan 1.3 workloads.
 - **Linker Hooks & AFBC:** Companion library `libgpd1.so` patched to export missing `GpuAuxBlitAHardwareBuffer` via bit-exact Bionic GnuHash; donor `libged.so` integrated; Arm Generic Timer calibrated to 13 MHz (`PLATFORM_AGT_FREQUENCY_KHZ=13000`); Gralloc AFBC manifests deployed.
 - **Mali-G57 Architecture Truth:** Mali-G57 (Valhall v1) uses the **Job Manager (JM)** interface (`BASE_UK_VERSION_MAJOR 11`), **NOT** CSF. Shader and pipeline compilation runs 100% in user-space, delivering full performance on Linux 4.14 without kernel bottlenecks.
@@ -129,15 +132,15 @@ ARM Mali GPUs require strict synchronization between the user-space driver (`vul
 
 These verified numbers represent the ground truth performance achievable with this repository:
 
-| Benchmark                     |   Pure Stock AOSP   | Memory Management Alone | EvergoTweaks (Thermal + Memory Management) | Verified Deltas                                    |
-| :---------------------------- | :-----------------: | :---------------------: | :----------------------------------------: | :------------------------------------------------- |
-| **Geekbench 7 Multi-Core**    |       `1,500`       |         `1,788`         |                **`2,133`**                 | 🚀 **+42.2% (+633 pts — Global MT6833 Record)**    |
+| Benchmark                     |   Pure Stock AOSP   | Memory Management Alone | EvergoTweaks (Thermal + Memory Management) | Verified Deltas                                   |
+| :---------------------------- | :-----------------: | :---------------------: | :----------------------------------------: | :------------------------------------------------ |
+| **Geekbench 7 Multi-Core**    |       `1,500`       |         `1,788`         |                **`2,133`**                 | 🚀 **+42.2% (+633 pts — Global MT6833 Record)**   |
 | **Geekbench 7 Single-Core**   |        `610`        |          `578`          |                 **`729`**                  | 🚀 **+19.5% (+119 pts — Global MT6833 Record)**   |
-| **3DMark Sling Shot Extreme** |       `2,518`       |         —               |                **`2,736`**                 | 🚀 **+8.7% All-Time Global MT6833 Record**         |
-| **3DMark Physics (Vulkan)**   |       `3,379`       |         —               |                **`4,053`**                 | 🚀 **+20.0% (+674 pts — World Record Physics)**    |
-| **Geekbench 7 GPU (Compute)** |       ~`1,080`      |         —               |                **`1,302`**                 | 🚀 **+20.6% (Mali-G57 MC2 @ 1068 MHz GED Boost)**  |
-| **Direct Reclaim Stalls**     |      ⚠️ Severe      |      🛡️ None       |   🛡️ **Zero Allocation Stalls**    | `direct_reclaim = 0`                               |
-| **App Retention**             | ❌ Aggressive Kills | ✅ 100% Kept Alive |       ✅ **100% Kept Alive**       | Retains Chrome tabs, music, launcher in ZRAM       |
+| **3DMark Sling Shot Extreme** |       `2,518`       |            —            |                **`2,736`**                 | 🚀 **+8.7% All-Time Global MT6833 Record**        |
+| **3DMark Physics (Vulkan)**   |       `3,379`       |            —            |                **`4,053`**                 | 🚀 **+20.0% (+674 pts — World Record Physics)**   |
+| **Geekbench 7 GPU (Compute)** |      ~`1,080`       |            —            |                **`1,302`**                 | 🚀 **+20.6% (Mali-G57 MC2 @ 1068 MHz GED Boost)** |
+| **Direct Reclaim Stalls**     |      ⚠️ Severe      |         🛡️ None         |       🛡️ **Zero Allocation Stalls**        | `direct_reclaim = 0`                              |
+| **App Retention**             | ❌ Aggressive Kills |   ✅ 100% Kept Alive    |           ✅ **100% Kept Alive**           | Retains Chrome tabs, music, launcher in ZRAM      |
 
 - **Official Geekbench 7 Verification (Side-by-Side vs Stock Baseline):** [https://browser.geekbench.com/v7/cpu/compare/400164?baseline=380539](https://browser.geekbench.com/v7/cpu/compare/400164?baseline=380539) | **GPU Compute Compare:** [https://browser.geekbench.com/v7/gpu/compare/183548?baseline=183548](https://browser.geekbench.com/v7/gpu/compare/183548?baseline=183548) (All-Time Record Runs: [400164 — 2133 MC](https://browser.geekbench.com/v7/cpu/400164) / [392815 — 2108 MC](https://browser.geekbench.com/v7/cpu/392815) / [391841 — 729 SC](https://browser.geekbench.com/v7/cpu/391841) / [389858 — 728 SC](https://browser.geekbench.com/v7/cpu/389858) / [385213 — 2066 MC](https://browser.geekbench.com/v7/cpu/385213) | GPU OpenCL Record: [183548 — 1302 pts](https://browser.geekbench.com/v7/gpu/183548))
 - **3DMark Sling Shot Extreme Official Runs:** OpenGL ES 3.1: **`2,736 pts`** (Graphics: **`2,557 pts`**, GT1: 17.30 FPS, GT2: 8.19 FPS) | Vulkan: **`2,734 pts`** (Physics: **`4,053 pts`** World Record, GT1: 17.00 FPS, GT2: 7.99 FPS).
@@ -239,7 +242,7 @@ python scripts/builder.py --thermal
 python scripts/builder.py --vulkan
 ```
 
-*Note: Flashable zips are always written exclusively to `package/<Module>/package/`.*
+_Note: Flashable zips are always written exclusively to `package/<Module>/package/`._
 
 ### Auditing Connected Device via ADB
 
@@ -297,7 +300,7 @@ python scripts/synctrees.py
 Or via PowerShell:
 
 ```powershell
-Get-ChildItem -Directory trees | ForEach-Object { 
+Get-ChildItem -Directory trees | ForEach-Object {
     git -C $_.FullName push origin
 }
 ```
@@ -359,4 +362,3 @@ All agents working within this codebase must strictly observe these rules:
 9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\Evergo\EvergoTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
 10. 🐙 **GitHub Primacy (FrontlXOX):** All project hosting, trees, forks, releases, and collaborator cherry-picks reside exclusively on **GitHub** under `https://github.com/FrontlXOX/` (`EvergoTweaks`, `device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`). GitLab has been completely deprecated per user directive.
 11. 🌲 **Submodule GitHub Tracking:** All submodules in `trees/` track their respective GitHub forks under `FrontlXOX` as remote `origin`. Upstream synchronization (`scripts/synctrees.py`) pushes directly to `origin` on GitHub.
-

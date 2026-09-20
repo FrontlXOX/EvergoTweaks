@@ -1,85 +1,32 @@
 Yo Goku! 👋
 
-Checked out the MillenniumOSS commits you sent for Tecno LH7n (MT6789):
-- Device: https://github.com/MillenniumOSS/android_device_tecno_LH7n/commit/84ff0d03a3338f928ea9523870245052917ada00
-- Vendor: https://github.com/MillenniumOSS/android_vendor_tecno_LH7n/commit/761b4fd3d48a61cc3488499a7519038b79f20d98
-- Common: https://github.com/MillenniumOSS/android_vendor_tecno_mt6789-common/commit/4f5654562669e987a4c92a9f5bc86c2efd6194cb
+Looked into the MillenniumOSS commits you sent (Tecno LH7n / MT6789). Here is the tl;dr, why LH7n pulled it off easily, how we solved it on 4.14, and the ready-to-cherry-pick GitLab commits:
 
-Here's the technical breakdown, why LH7n pulled it off so easily, why direct replacement breaks on our 4.14 kernel, how we got Vulkan 1.3 working 100% on MT6833, and the exact commits on our GitLab forks for you to check out and pull.
+### 1. Why LH7n worked vs our 4.14
+- **Tecno LH7n** runs **Linux 5.10 GKI** — its kernel `mali_kbase` natively understands modern unified `libGLES_mali.so` IOCTLs.
+- **Our device (`everpal`)** runs **Linux 4.14.357-Aqua** with `mali-r32p1`. Replacing `libGLES_mali.so` directly instantly panics SurfaceFlinger due to IOCTL command mismatch.
 
----
+### 2. Our Solution: Hybrid Decoupling (0 Crashes)
+- **Keep stock `libGLES_mali.so` (r32p1)** for SurfaceFlinger and HWUI system rendering (rock-solid, no UI regressions).
+- **Standalone Vulkan 1.3 ICD (`libVK13_mali.so`)** extracted from **Redmi Note 13 5G (`gold`, MT6833)** on **HyperOS 3.0 Android 15** (`OS3.0.10.0.VNQCNXM`).
+- **Mali-G57 Architecture:** Valhall v1 uses **Job Manager (JM)** interface (`BASE_UK_VERSION_MAJOR 11`), NOT CSF. Vulkan shader/pipeline compiling is 100% user-space in the ICD driver — runs natively on 4.14 without kernel stalls!
+- **Linker Hooks & AFBC:** Patched `libgpd1.so` (exports `GpuAuxBlitAHardwareBuffer`), AGT timer @ 13 MHz, Gralloc AFBC XML manifests, and injected EGL format mappings.
 
-### 1. The Tecno LH7n vs MT6833 Kernel Difference
+### 3. About the "Capped" 3DMark Benchmark
+- 3DMark physics simulation ticks at fixed 33ms steps ($1000/33 = 30.30$ FPS max engine rate).
+- Sustained 2.4 GHz Big cores maxed out the frame cap on all 3 sections ($30.30$ FPS), yielding the **`4,053` World Record Physics score**. Overall run is completely uncapped (`capped: false`).
 
-- **What MillenniumOSS did:**
-  They pulled Mali blobs (`libGLES_mali.so`, `vulkan.mali.so`) from the Motorola Moto G35 (`XT2513-1`, `kansas`, MT6835 / Dimensity 6300, Android 15), dropped in `mali_platform.config`, the Gralloc AFBC XMLs, and added the `ro.vendor.arm.egl.configs.*` HAL format mappings in `vendor.prop`.
-- **Why it worked out-of-the-box for them:**
-  Tecno LH7n runs on **Linux 5.10 GKI** (`android_kernel_common_android12-5.10`). Its kernel `mali_kbase` is already updated and natively understands the newer IOCTL ABIs that newer unified `libGLES_mali.so` binaries use.
-- **Why doing the same crashes on our everpal:**
-  Our device is on **Linux 4.14.357-Aqua**. The 4.14 stock kernel driver is `mali-r32p1`. When a newer monolithic `libGLES_mali.so` is loaded by SurfaceFlinger, IOCTL command mismatches cause SurfaceFlinger to immediately SIGSEGV / crash.
+### 4. Ready-to-Merge Commits on GitLab 🚀
+- 🔹 **Device Tree:** https://gitlab.com/ShovitDutta1/device_xiaomi_everpal/-/commit/ebde075
+  *(Vulkan 1.3 XML, dEQP 2023-03-01, EGL format mappings, AFBC manifests)*
+- 🔹 **Vendor Tree:** https://gitlab.com/ShovitDutta1/vendor_xiaomi_everpal/-/commit/86c3a45
+  *(Valhall r49p1 ICD `libVK13_mali.so`, patched `libgpd1.so`, multilib `Android.bp`, AFBC configs)*
+- 🔹 **Kernel Tree:** https://gitlab.com/ShovitDutta1/android_kernel_xiaomi_mt6833/-/tree/vulkan-1.3
 
----
+### 5. 4.14 Kernel Shims (If you backport 5.10 `mali_kbase`)
+1. `access_ok()` shim: 4.14 takes 3 args `(VERIFY_READ, addr, size)` vs 2 args on 5.0+.
+2. ION Allocator: Retain `#ifdef CONFIG_ION` paths in `mali_kbase_mem_linux.c`.
+3. Fence deadlines: Stub/guard modern `dma_fence_set_deadline()` (missing on 4.14).
+4. MTK Glue: Keep `platform/mt6833/` and `platform/mtk_platform_common/` from r32p1.
 
-### 2. How We Solved It: Hybrid Decoupled Architecture
-
-Instead of fighting SurfaceFlinger on 4.14, we decoupled the graphics stack:
-1. **Rock-Solid System GLES:**
-   We keep stock `libGLES_mali.so` (r32p1) exclusively for SurfaceFlinger and HWUI system rendering. Zero crashes, zero display regressions.
-2. **Dedicated Valhall Vulkan 1.3 ICD:**
-   We deployed a standalone **Valhall r49p1 Vulkan 1.3 ICD** (`libVK13_mali.so`) extracted directly from **Redmi Note 13 5G / 13R Pro (`gold`, Dimensity 6080 / MT6833)** on **HyperOS 3.0 Android 15** (`OS3.0.10.0.VNQCNXM`).
-3. **Mali-G57 Hardware Architecture Fact:**
-   Mali-G57 (Valhall v1) uses the **Job Manager (JM)** interface (`BASE_UK_VERSION_MAJOR 11`), **NOT** CSF (Command Stream Frontend). Because shader and pipeline compilation runs 100% in user-space in the ICD driver, it runs natively on Linux 4.14 without hitting kernel bottlenecks!
-4. **Linker Hooks & AFBC:**
-   - Patched companion `libgpd1.so` to export the missing `GpuAuxBlitAHardwareBuffer` symbol via bit-exact Bionic GnuHash.
-   - Calibrated Arm Generic Timer frequency to 13 MHz (`PLATFORM_AGT_FREQUENCY_KHZ=13000`).
-   - Integrated full Gralloc AFBC manifests (`cam.xml`, `dpu.xml`, `dpu_aeu.xml`, `gpu.xml`, `vpu.xml`) and `mali_platform.config`.
-   - Injected the EGL pixel format mappings from the Motorola reference into `vendor.prop`.
-
----
-
-### 3. About the "Capped" 3DMark Benchmark Question
-
-If you noticed 3DMark Sling Shot Extreme reporting "30.30 FPS (Capped)":
-- The 3DMark physics simulation engine caps physics step ticks at 33.0 ms ($1000 / 33 = 30.30$ FPS max engine rate).
-- Because our Cortex-A76 Big cores were pinned at sustained 2.40 GHz with sconfig 10, all 3 physics sections completed calculations way faster than 33 ms and hit the maximum frame rate ceiling on all 3 sections ($30.30$ FPS), giving us the **`4,053` World Record Physics score**!
-- The overall benchmark is NOT capped (`capped: false` in database), achieving **2,736 pts** in GLES 3.1 and **2,734 pts** in Vulkan.
-
----
-
-### 4. Ready-to-Merge Commits on GitLab
-
-I've set up public forks on GitLab with clean, isolated commits on the `vulkan-1.3` (and `lineage-23.2`) branches:
-
-🔹 **Device Tree Commit:**
-- **URL:** https://gitlab.com/ShovitDutta1/device_xiaomi_everpal/-/commit/ebde075
-- **Branch:** `vulkan-1.3` / `lineage-23.2`
-- **Changes:**
-  - `device.mk`: Upgraded Vulkan feature XML to `android.hardware.vulkan.version-1_3.xml` and dEQP level to `2023-03-01`.
-  - `configs/props/vendor.prop`: Added `ro.vendor.arm.egl.configs.*` 32-bit/16-bit/64-bit HAL format mappings.
-  - `proprietary-files.txt`: Added `mali_platform.config`, `gralloc/*.xml`, and the Vulkan 1.3 / companion libraries.
-
-🔹 **Vendor Tree Commit:**
-- **URL:** https://gitlab.com/ShovitDutta1/vendor_xiaomi_everpal/-/commit/86c3a45
-- **Branch:** `vulkan-1.3` / `lineage-23.2`
-- **Changes:**
-  - Added prebuilt binaries: `libVK13_mali.so`, `libgpd1.so`, `libged.so`, `vulkan.mali.so` (both `lib/` and `lib64/`).
-  - Added Gralloc AFBC configs + `mali_platform.config` in `proprietary/vendor/etc/`.
-  - Updated `Android.bp`: Multilib `both` support for `vulkan.mali`, `libged`, and new `libVK13_mali` & `libgpd1` definitions.
-  - Updated `everpal-vendor.mk`: Added gralloc files to `PRODUCT_COPY_FILES` and modules to `PRODUCT_PACKAGES`.
-
-🔹 **Kernel Tree Fork:**
-- **URL:** https://gitlab.com/ShovitDutta1/android_kernel_xiaomi_mt6833/-/tree/vulkan-1.3
-- **Branch:** `vulkan-1.3` / `lineage-24.0`
-- Full kernel source with complete commit history synced.
-
----
-
-### 5. Kernel Backport Notes (For 4.14 if backporting 5.10 mali_kbase)
-
-If you still want to port the full 5.10 `mali_kbase` into 4.14 so that a single unified `libGLES_mali.so` can be used:
-1. **`access_ok()` API shim:** 4.14 takes 3 arguments: `access_ok(VERIFY_READ, addr, size)` whereas 5.0+ takes 2 arguments: `access_ok(addr, size)`. Wrap this with a compat macro.
-2. **ION Buffer Allocator:** 4.14 uses ION for graphic buffers. In `mali_kbase_mem_linux.c`, retain the `#ifdef CONFIG_ION` allocator paths from `mali-r32p1` instead of relying solely on modern `dma_buf_map_attachment`.
-3. **Fence Deadlines:** Modern DDKs call `dma_fence_set_deadline()`. Guard or stub this since 4.14 sync fences lack deadline hints.
-4. **MediaTek Glue:** Retain `platform/mt6833/` and `platform/mtk_platform_common/` from `mali-r32p1` to maintain GED and DVFS integration.
-
-Feel free to inspect the commits, cherry-pick what you need, and test! Let me know if you run into any hurdles. 🚀
+Check the commits and cherry-pick what you need! Let me know if you hit any snag. 🔥

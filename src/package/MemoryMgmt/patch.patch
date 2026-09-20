@@ -1,0 +1,94 @@
+From 42d0a1ba5b930e15c4726f48f8a3766fafd9f5ba Mon Sep 17 00:00:00 2001
+From: Shovit Dutta <shovit@cinepod.local>
+Date: Fri, 18 Sep 2026 18:15:00 +0530
+Subject: [PATCH] everpal: refine memory management to v7 production architecture
+
+- lmkd: raise thrashing_limit 150 -> 300 for multi-core ray tracing burst tolerance
+- lmkd: lower swap_free_low_percentage 5 -> 2 to eliminate emergency kill escalation
+- lmkd: raise swap_util_max 85 -> 90
+- lmkd: set psi_partial_stall_ms=250 and psi_complete_stall_ms=800
+- lmkd: add kill_timeout_ms=250 for precise evaluation pacing
+- init: set watermark_scale_factor=20 to prevent Zone Normal false-positive breaches
+- init: set min_free_kbytes=24576 to balance atomic reserves across all 3 zones
+- init: clean up duplicate comp_algorithm write, standardizing on lz4
+- init.everpal: replace non-existent compaction_proactiveness with compact_memory=1 (Linux 4.14)
+---
+ configs/props/vendor.prop | 19 ++++++++++---------
+ init/init.everpal.rc      |  4 ++--
+ init/init.mt6833.rc       |  6 ++----
+ 3 files changed, 14 insertions(+), 15 deletions(-)
+
+diff --git a/configs/props/vendor.prop b/configs/props/vendor.prop
+index caa3a44..f19e782 100644
+--- a/configs/props/vendor.prop
++++ b/configs/props/vendor.prop
+@@ -173,17 +173,18 @@ ro.config.low_ram=false
+ ro.lmk.use_psi=true
+ ro.lmk.use_minfree_levels=false
+ ro.lmk.use_new_strategy=true
+-ro.lmk.thrashing_limit=150
+-ro.lmk.thrashing_limit_decay=10
++ro.lmk.thrashing_limit=300
++ro.lmk.thrashing_limit_decay=15
+ ro.lmk.downgrade_pressure=80
+-ro.lmk.swap_util_max=85
+-ro.lmk.swap_free_low_percentage=5
++ro.lmk.swap_util_max=90
++ro.lmk.swap_free_low_percentage=2
+ ro.lmk.kill_heaviest_task=false
+ 
+-# PSI: 70ms partial fired on every GPU/CPU burst and caused 18
+-# false-positive "not responding" kills under 3D load.
+-# 200ms partial + 700ms complete tolerate legitimate load spikes.
+-ro.lmk.psi_partial_stall_ms=200
+-ro.lmk.psi_complete_stall_ms=700
++# PSI & Kill Pacing
++ro.lmk.psi_partial_stall_ms=250
++ro.lmk.psi_complete_stall_ms=800
++ro.lmk.kill_timeout_ms=250
++ro.lmk.critical_upgrade=false
+ 
+ # Activity Manager
+-ro.vendor.qti.am.reschedule_service_delay=10000
+ persist.sys.fw.bg_apps_limit=64
+ persist.device_config.activity_manager.max_cached_processes=64
+ persist.device_config.activity_manager.max_phantom_processes=32
+diff --git a/init/init.everpal.rc b/init/init.everpal.rc
+index 5c8f2af..7e91240 100644
+--- a/init/init.everpal.rc
++++ b/init/init.everpal.rc
+@@ -1,4 +1,4 @@
+ on property:sys.boot_completed=1
+-    # After boot, further optimize memory management
++    # Linux 4.14 memory compaction (compaction_proactiveness is 5.8+ only)
+     write /proc/sys/vm/stat_interval 10
+-    write /proc/sys/vm/compaction_proactiveness 20
++    write /proc/sys/vm/compact_memory 1
+diff --git a/init/init.mt6833.rc b/init/init.mt6833.rc
+index c315ed2..e9b28a1 100644
+--- a/init/init.mt6833.rc
++++ b/init/init.mt6833.rc
+@@ -104,8 +104,6 @@ on fs
+     write /sys/kernel/tracing/trace_marker "E"
+     write /proc/bootprof "INIT:Mount_END"
+ 
+-    # ZRAM - prefer zstd; fall back to lz4 if kernel lacks CONFIG_CRYPTO_ZSTD
+-    # (Linux 4.14 on this device does not always ship zstd in /proc/crypto)
+-    write /sys/block/zram0/comp_algorithm zstd
++    # ZRAM compression algorithm (lz4 is hardware optimal on MT6833)
+     write /sys/block/zram0/comp_algorithm lz4
+ 
+     # Swappiness: 80 balances ZRAM use and RAM retention
+     write /proc/sys/vm/swappiness 80
++    write /proc/sys/vm/watermark_scale_factor 20
+     write /sys/kernel/mm/swap/vma_ra_enabled false
+ 
+     # Memory management
+     write /proc/sys/vm/page-cluster 0
+-    write /proc/sys/vm/min_free_kbytes 18432
++    write /proc/sys/vm/min_free_kbytes 24576
+     write /proc/sys/vm/vfs_cache_pressure 80
+     write /proc/sys/vm/dirty_ratio 30
+     write /proc/sys/vm/dirty_background_ratio 10
+--
+2.43.0

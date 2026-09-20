@@ -1,6 +1,6 @@
-# EvergoTweaks — Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G
+# EverpalTweaks — Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G
 
-> **Production Memory (RAM/LMKD) & Thermal Mitigation Suite for Android 16 (`everpal` / `evergo`)**
+> **Production Memory (RAM/LMKD) & Thermal Mitigation Suite for Android 16 (`everpal`)**
 > **Prepared By:** Shovit Dutta
 > **Author / Research:** Addster09 x himanshuksr0007 (Goku) x Shovit Dutta
 > **Target Platform:** MediaTek Dimensity 810 5G (MT6833P / MT6833 family, Mali-G57 MC2)
@@ -16,7 +16,7 @@
 | **Geekbench 7 Single-Core** | [![Geekbench 7 Single-Core](https://img.shields.io/badge/Single--Core-729_(Record)-brightgreen?style=for-the-badge&logo=speedtest&logoColor=white)](https://browser.geekbench.com/v7/cpu/391841) | **`729` SC**<br>`+19.5%` (+119 pts) | 2.40 GHz Cortex-A76 Big core • DVFSRC 4.266 GHz LPDDR4X • 0 µs Schedutil ramp |
 | **Geekbench 7 Multi-Core** | [![Geekbench 7 Multi-Core](https://img.shields.io/badge/Multi--Core-2133_(Record)-brightgreen?style=for-the-badge&logo=speedtest&logoColor=white)](https://browser.geekbench.com/v7/cpu/400164) | **`2,133` MC**<br>`+42.2%` (+633 pts) | 8 Cores (2x A76 + 6x A55) • CoreLink CCI 1.60 GHz • 55°C NoLimits headroom |
 | **CPU Official Compare** | [![Geekbench 7 CPU Compare](https://img.shields.io/badge/CPU_Comparison-Verified_vs_Stock-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://browser.geekbench.com/v7/cpu/compare/400164?baseline=380539) | **Run 400164**<br>vs Run 380539 | Verified side-by-side CPU proof against pure stock baseline (+42.2% Multi-Core) |
-| **3DMark Sling Shot Extreme** | [![3DMark Record](https://img.shields.io/badge/3DMark-2736_(Record)-red?style=for-the-badge&logo=gamedeveloper&logoColor=white)](https://github.com/FrontlXOX/EvergoTweaks) | **`2,736` pts**<br>`+8.7%` Boost | Mali-G57 @ 1068 MHz • 2557 Graphics (GT1: 17.3 FPS) • 4053 Vulkan Physics |
+| **3DMark Sling Shot Extreme** | [![3DMark Record](https://img.shields.io/badge/3DMark-2736_(Record)-red?style=for-the-badge&logo=gamedeveloper&logoColor=white)](https://github.com/FrontlXOX/EverpalTweaks) | **`2,736` pts**<br>`+8.7%` Boost | Mali-G57 @ 1068 MHz • 2557 Graphics (GT1: 17.3 FPS) • 4053 Vulkan Physics |
 | **Geekbench 7 GPU (Compute)** | [![Geekbench 7 GPU](https://img.shields.io/badge/GPU_Compute-1302_(Record)-orange?style=for-the-badge&logo=arm&logoColor=white)](https://browser.geekbench.com/v7/gpu/183548) | **`1,302` pts**<br>`+20.6%` Boost | ARM Mali-G57 MC2 @ 1068 MHz GED boost • 50ms DVFS lock • OpenCL Compute |
 | **GPU Official Compare** | [![Geekbench 7 GPU Compare](https://img.shields.io/badge/GPU_Comparison-Verified_Run-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://browser.geekbench.com/v7/gpu/compare/183548?baseline=183548) | **Run 183548**<br>Compute Audit | Official side-by-side Geekbench 7 GPU sub-workload analysis & verification |
 
@@ -24,7 +24,7 @@
 
 ## ⚡ Overview
 
-**EvergoTweaks** is an empirically audited, hardware-verified optimization suite developed to resolve custom ROM performance collapse and aggressive background process termination on the Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal` / `evergo`).
+**EverpalTweaks** is an empirically audited, hardware-verified optimization suite developed to resolve custom ROM performance collapse and aggressive background process termination on the Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal`).
 
 Tested live on real hardware with deep kernel diagnostics, this repository provides **production device tree patches** and **ready-to-flash KernelSU/Magisk modules** that elevate the MT6833 to world-record benchmark scores while guaranteeing rock-solid stability and app retention.
 
@@ -32,7 +32,7 @@ Tested live on real hardware with deep kernel diagnostics, this repository provi
 
 ## 🏆 Global MT6833 Benchmark Records
 
-| Workload / Benchmark          | Pure Stock AOSP | Memory Management Alone | EvergoTweaks (Thermal + Memory Management) | Improvement                                                    |
+| Workload / Benchmark          | Pure Stock AOSP | Memory Management Alone | EverpalTweaks (Thermal + Memory Management) | Improvement                                                    |
 | :---------------------------- | :-------------: | :---------------------: | :----------------------------------------: | :------------------------------------------------------------- |
 | **Geekbench 7 Multi-Core**    |     `1,500`     |         `1,788`         |                **`2,133`**                 | 🚀 **+42.2% (+633 pts — Global MT6833 Record!)**               |
 | **Geekbench 7 Single-Core**   |      `610`      |          `578`          |                 **`729`**                  | 🚀 **+19.5% (+119 pts — New Global MT6833 Record!)**           |
@@ -106,7 +106,7 @@ Tested live on real hardware with deep kernel diagnostics, this repository provi
 
 | Attribute             | Specification Details                                                         |
 | :-------------------- | :---------------------------------------------------------------------------- |
-| **Commercial Device** | Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal` / `evergo`)              |
+| **Commercial Device** | Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal`)              |
 | **Model Identifier**  | `Xiaomi 22031116AI` (Motherboard: `everpal`, Board ID: `S98016LA1`)           |
 | **Operating System**  | **Android 16** (Project Infinity - LineageOS 23.0 Base)                       |
 | **Android Build ID**  | `BP4A.251205.006 release-keys` (`eng.androi.20260917.074937`)                 |
@@ -131,69 +131,83 @@ Tested live on real hardware with deep kernel diagnostics, this repository provi
 <br>
 
 ```text
-EvergoTweaks/
+EverpalTweaks/
 ├── README.md                          # Master repository overview & benchmark guide
 ├── AGENTS.md                          # Comprehensive AI agent operational specification
 ├── CHANGELOG.md                       # Version history & complete benchmark progression
 ├── LICENSE                            # Apache 2.0 License
 ├── .gitignore                         # Standard exclusion rules
 │
-├── scripts/                           # 🛠️ Centralized Repository Automation Tooling (Root-Only)
-│   ├── autobench.py                   # Automated Geekbench 7 (CPU + GPU Vulkan) suite with real-time CLI telemetry
-│   ├── benchpull.py                   # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
-│   ├── builder.py                     # Unified master module packager & CRC-32 validator (--all, --memory, --thermal, --vulkan, --spatial)
-│   ├── decrypt_thermal.py             # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
-│   ├── synctrees.py                   # Submodule tree synchronizer for FrontlXOX GitHub forks
-│   └── verifydevice.py                # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
-│
-├── trees/                             # 🌲 Upstream Git Submodules (Reference trees)
-│   ├── device_xiaomi_everpal/         # Addster09/device_xiaomi_everpal (lineage-23.2)
-│   ├── kernel/                        # Addster09/android_kernel_xiaomi_mt6833 (lineage-24.0)
-│   ├── upstream-device/               # xiaomi-mt6833-dev/device_xiaomi_everpal (lineage-23.2)
-│   └── vendor_xiaomi_everpal/         # xiaomi-mt6833-dev/vendor_xiaomi_everpal (lineage-23.2)
-│
-└── package/                           # 📦 Flashable Subsystems & Packaging Assets
-    ├── templates/                     # Shared Magisk/KernelSU installer templates
-    │   └── META-INF/com/google/android/ # Vendored update-binary & updater-script stubs
+└── src/                               # 📁 Project Source & Engineering Assets
+    ├── docs/                          # Architectural documentation & engineering session archives
+    ├── modules/                       # 📲 Third-Party Companion Modules (Zygisk, ViPER, HideNavBar)
     │
-    ├── MemoryMgmt/                    # 🧠 RAM & LMKD Architecture Subsystem
-    │   ├── README.md                  # Detailed technical manual & QA audit
-    │   ├── patch.patch                # Unified git patch for device_xiaomi_everpal
-    │   ├── package/
-    │   │   └── MemoryMgmt.zip         # Flashable module (Author: FrontlXOX)
-    │   └── docs/                      # Architectural blueprint & integration guide
-    │       └── memory-mgmt.txt        # Master blueprint, LMKD tuning logic & zone math
+    ├── package/                       # 📦 Flashable Subsystems & Packaging Assets
+    │   ├── MemoryMgmt/                # 🧠 RAM & LMKD Architecture Subsystem
+    │   │   ├── README.md              # Detailed technical manual & QA audit
+    │   │   ├── patch.patch            # Unified git patch for device_xiaomi_everpal
+    │   │   ├── package/
+    │   │   │   └── MemoryMgmt.zip     # Flashable module (Author: FrontlXOX)
+    │   │   └── docs/                  # Architectural blueprint & integration guide
+    │   │       └── memory-mgmt.txt    # Master blueprint, LMKD tuning logic & zone math
+    │   │
+    │   ├── ThermalMgmt/               # 🔥 Thermal Mitigation & mi_thermald Architecture
+    │   │   ├── README.md              # Hardware audit & decrypted Xiaomi AES configuration breakdown
+    │   │   ├── patch.patch            # Unified git patch for device & vendor trees
+    │   │   ├── package/
+    │   │   │   └── ThermalMgmt.zip    # Flashable module (Author: FrontlXOX)
+    │   │   └── docs/                  # Benchmark logs, SQLite database & vendor configs
+    │   │       ├── benchmark_history.txt # Chronological benchmark log
+    │   │       ├── fm_local_results.db # Raw SQLite database from 3DMark Sling Shot Extreme
+    │   │       ├── history.db         # Raw SQLite database pulled from Geekbench 7
+    │   │       ├── thermal-mgmt.txt   # Master thermal analysis & register teardown
+    │   │       └── vendor_configs/    # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
+    │   │
+    │   ├── Vulkan13/                  # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
+    │   │   ├── README.md              # Architecture, linker hooks & benchmark audit
+    │   │   ├── patch.patch            # Unified diff for device and vendor trees
+    │   │   ├── package/
+    │   │   │   └── Vulkan13-KernelSU.zip # Flashable module (Author: FrontlXOX)
+    │   │   └── docs/                  # Master Vulkan 1.3 hybrid architecture document
+    │   │       └── vulkan-mgmt.txt
+    │   │
+    │   ├── SpatialAudio/              # 🎧 Spatial Audio Routing & Hardware Constraint Subsystem
+    │   │   ├── README.md              # Root-cause analysis & AudioFlinger routing fix
+    │   │   ├── patch.patch            # Standalone unified git patch for device_xiaomi_everpal
+    │   │   ├── package/
+    │   │   │   └── SpatialAudio.zip   # Flashable module (Author: FrontlXOX)
+    │   │   └── docs/                  # Architectural blueprint & integration guide
+    │   │       └── spatial-audio.txt  # Master blueprint & technical specification
+    │   │
+    │   └── templates/                 # Shared Magisk, KernelSU & AnyKernel3 packaging templates
+    │       ├── AnyKernel3/            # Base AnyKernel3 flashable zip packaging assets
+    │       ├── META-INF/              # Generic Magisk update-binary stubs
+    │       ├── SpatialAudio/          # Spatial Audio configuration overlays
+    │       └── Vulkan13/              # Hybrid ICD stack, companion libraries & SELinux scripts
     │
-    ├── ThermalMgmt/                   # 🔥 Thermal Mitigation & mi_thermald Architecture
-        ├── README.md                  # Hardware audit & decrypted Xiaomi AES configuration breakdown
-        ├── patch.patch                # Unified git patch for device & vendor trees
-        ├── package/
-        │   └── ThermalMgmt.zip        # Flashable module (Author: FrontlXOX)
-        └── docs/                      # Benchmark logs, SQLite database & vendor configs
-            ├── benchmark_history.txt  # Chronological benchmark log
-            ├── history.db             # Raw SQLite database pulled from Geekbench 7
-            ├── thermal-mgmt.txt       # Master thermal analysis & register teardown
-            └── vendor_configs/        # Raw .conf & decrypted AES .decrypted.txt Xiaomi thermal profiles
-    ├── Vulkan13/                      # 🎮 Vulkan 1.3 Hybrid Engine Subsystem
-    │   ├── README.md                  # Architecture, linker hooks & benchmark audit
-    │   ├── package/
-    │   │   └── Vulkan13-KernelSU.zip  # Flashable module (Author: FrontlXOX)
-    │   └── template/                  # Hybrid ICD stack, companion libraries & SELinux scripts
+    ├── scripts/                       # 🛠️ Centralized Repository Automation Tooling (Root-Only)
+    │   ├── autobench.py               # Automated Geekbench 7 (CPU + GPU Vulkan) suite with real-time CLI telemetry
+    │   ├── benchpull.py               # Automated ADB extractor for Geekbench 7 & 3DMark Sling Shot Extreme DBs
+    │   ├── builder.py                 # Unified master module packager & CRC-32 validator (--all, -m, -t, -v, -s)
+    │   ├── decouple_libge2.py         # Vulkan 1.3 companion library patcher
+    │   ├── decrypt_thermal.py         # Xiaomi OpenSSL AES-128-CBC encryption/decryption CLI
+    │   ├── generate_docs.py           # Master transcript generator & compressor
+    │   ├── synctrees.py               # Submodule tree synchronizer for FrontlXOX GitHub forks
+    │   └── verifydevice.py            # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
     │
-    └── SpatialAudio/                  # 🎧 Spatial Audio Routing & Hardware Constraint Subsystem
-        ├── README.md                  # Root-cause analysis & AudioFlinger routing fix
-        ├── patch.patch                # Standalone unified git patch for device_xiaomi_everpal
-        ├── package/
-        │   └── SpatialAudio.zip       # Flashable module (Author: FrontlXOX)
-        └── docs/                      # Architectural blueprint & integration guide
-            └── spatial-audio.txt      # Master blueprint & technical specification
+    └── trees/                         # 🌲 Submodule Forks on GitHub (FrontlXOX)
+        ├── device_xiaomi_everpal/     # FrontlXOX device tree (lineage-23.2)
+        ├── kernel/                    # FrontlXOX Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
+        ├── kernel-5.10/               # MediaTek 5.10 GKI donor kernel (vic, mt6789/mt6833 sibling)
+        ├── upstream-device/           # xiaomi-mt6833-dev reference tree (vulkan-1.3)
+        └── vendor_xiaomi_everpal/     # FrontlXOX vendor blobs (vulkan-1.3, lineage-23.2)
 ```
 
 </details>
 
 ---
 
-## 🧠 1. Memory Subsystem (`package/MemoryMgmt/`)
+## 🧠 1. Memory Subsystem (`src/package/MemoryMgmt/`)
 
 <details>
 <summary><b>🧠 Tap to expand Memory Subsystem Deep Dive & Mathematical Zone Analysis</b></summary>
@@ -209,13 +223,13 @@ Custom ROMs on Android 16 suffered from aggressive background app killing due to
   - Dynamically scaled process pools: `bg_apps_limit = 64` (4GB), `96` (6GB), `128` (8GB).
   - Lowered `ro.lmk.swap_free_low_percentage = 2` (dynamic 2% emergency cushion).
   - Tuned `swappiness = 80`, `vfs_cache_pressure = 80`, and `compact_memory = 1`.
-- **Details & Patch:** See [`package/MemoryMgmt/README.md`](./package/MemoryMgmt/README.md) and [`package/MemoryMgmt/patch.patch`](./package/MemoryMgmt/patch.patch).
+- **Details & Patch:** See [`src/package/MemoryMgmt/README.md`](./src/package/MemoryMgmt/README.md) and [`src/package/MemoryMgmt/patch.patch`](./src/package/MemoryMgmt/patch.patch).
 
 </details>
 
 ---
 
-## 🔥 2. Thermal Subsystem (`package/ThermalMgmt/`)
+## 🔥 2. Thermal Subsystem (`src/package/ThermalMgmt/`)
 
 <details>
 <summary><b>🔥 Tap to expand Thermal Subsystem Deep Dive, AES Decryption & Hardware Traps</b></summary>
@@ -228,13 +242,13 @@ Custom ROMs suffered from severe thermal downclocking due to missing Xiaomi prop
   - Mapped `sconfig 10` (Xiaomi High-Performance Mobile Game / NoLimits profile).
   - Elevated throttle trigger from **36°C to 55°C**, allowing the CPU (2.0 GHz A55 / 2.4 GHz A76) and Mali-G57 GPU to sustain **100% uncapped capability**. Below 55°C, thermal governor applies zero throttling; targets (862/898 MHz) represent emergency safety floors if temperatures exceed 55°C.
   - Neutralized 3 hardware traps: avoided `sconfig 14` (YouTube low-power clamp), `/proc/driver/thermal/set_sspm_big_limit_threshold` (unkillable 84% CPU spinloop), and `mtk-cl-backlight` (black screen bug).
-- **Details & Patch:** See [`package/ThermalMgmt/README.md`](./package/ThermalMgmt/README.md) and [`package/ThermalMgmt/patch.patch`](./package/ThermalMgmt/patch.patch).
+- **Details & Patch:** See [`src/package/ThermalMgmt/README.md`](./src/package/ThermalMgmt/README.md) and [`src/package/ThermalMgmt/patch.patch`](./src/package/ThermalMgmt/patch.patch).
 
 </details>
 
 ---
 
-## 🎮 3. Vulkan 1.3 Subsystem (`package/Vulkan13/`)
+## 🎮 3. Vulkan 1.3 Subsystem (`src/package/Vulkan13/`)
 
 <details>
 <summary><b>🎮 Tap to expand Vulkan 1.3 Hybrid Engine, Linker Hooks & Benchmark Records</b></summary>
@@ -251,13 +265,13 @@ Custom ROMs on MediaTek MT6833 suffered from outdated Vulkan 1.1 graphics stacks
   - **Architecture Validation:** Verified that Mali-G57 (Valhall v1) operates strictly on the **Job Manager (JM)** interface (`BASE_UK_VERSION_MAJOR 11`) rather than CSF, enabling 100% user-space shader and state compilation without kernel-space performance degradation.
   - **Verified Recognition:** Android 16 reports `vulkanVersion = 4206592` (Vulkan 1.3.0) with zero driver loading failures (`createdVulkanDevice = 1`).
   - **Benchmark Records:** Delivered all-time MT6833 records in **3DMark Sling Shot Extreme** (**2,736 pts overall**, **4,053 Vulkan physics**).
-- **Details & Package:** See [`package/Vulkan13/README.md`](./package/Vulkan13/README.md) and [`package/Vulkan13/package/Vulkan13-KernelSU.zip`](./package/Vulkan13/package/Vulkan13-KernelSU.zip).
+- **Details & Package:** See [`src/package/Vulkan13/README.md`](./src/package/Vulkan13/README.md) and [`src/package/Vulkan13/package/Vulkan13-KernelSU.zip`](./src/package/Vulkan13/package/Vulkan13-KernelSU.zip).
 
 </details>
 
 ---
 
-## 🎧 4. Spatial Audio Subsystem (`package/SpatialAudio/`)
+## 🎧 4. Spatial Audio Subsystem (`src/package/SpatialAudio/`)
 
 <details>
 <summary><b>🎧 Tap to expand Spatial Audio Routing Deep Dive & Constraint Analysis</b></summary>
@@ -269,7 +283,7 @@ Custom ROMs on MediaTek MT6833 suffered from outdated Vulkan 1.1 graphics stacks
   - **Per-Stream Postprocess Decoupling:** Relocates Dolby DAP and DVL listeners to `<postprocess>` per stream type (`music`, `ring`, `alarm`, `notification`, `voice_call`), preventing global attachment conflicts on the `AUDIO_OUTPUT_FLAG_SPATIALIZER` thread.
   - **Hardware Constraint Realignment:** Disables speaker spatialization (`persist.vendor.audio.spatializer.speaker_enabled=false`) on the mono-class amp, halts head-tracker sensor retry loops (`ro.audio.spatializer.headtracking_supported=false`, `ro.audio.monitorRotation=false`), and disables missing ultrasound proximity modems (`ro.vendor.audio.us.proximity=false`).
   - **Legacy Spatializer Query Fallback:** Sets `ro.audio.spatializer.use_legacy_param_query=true` to handle MTK HAL query compatibility.
-- **Details & Package:** See [`package/SpatialAudio/README.md`](./package/SpatialAudio/README.md) and [`package/SpatialAudio/package/SpatialAudio.zip`](./package/SpatialAudio/package/SpatialAudio.zip).
+- **Details & Package:** See [`src/package/SpatialAudio/README.md`](./src/package/SpatialAudio/README.md) and [`src/package/SpatialAudio/package/SpatialAudio.zip`](./src/package/SpatialAudio/package/SpatialAudio.zip).
 
 </details>
 
@@ -285,10 +299,10 @@ Custom ROMs on MediaTek MT6833 suffered from outdated Vulkan 1.1 graphics stacks
 
 For instant live testing without recompiling ROM images:
 
-1. Flash [`package/MemoryMgmt/package/MemoryMgmt.zip`](./package/MemoryMgmt/package/MemoryMgmt.zip) via your root manager.
-2. Flash [`package/ThermalMgmt/package/ThermalMgmt.zip`](./package/ThermalMgmt/package/ThermalMgmt.zip) via your root manager.
-3. Flash [`package/Vulkan13/package/Vulkan13-KernelSU.zip`](./package/Vulkan13/package/Vulkan13-KernelSU.zip) via your root manager.
-4. Flash [`package/SpatialAudio/package/SpatialAudio.zip`](./package/SpatialAudio/package/SpatialAudio.zip) via your root manager.
+1. Flash [`src/package/MemoryMgmt/package/MemoryMgmt.zip`](./src/package/MemoryMgmt/package/MemoryMgmt.zip) via your root manager.
+2. Flash [`src/package/ThermalMgmt/package/ThermalMgmt.zip`](./src/package/ThermalMgmt/package/ThermalMgmt.zip) via your root manager.
+3. Flash [`src/package/Vulkan13/package/Vulkan13-KernelSU.zip`](./src/package/Vulkan13/package/Vulkan13-KernelSU.zip) via your root manager.
+4. Flash [`src/package/SpatialAudio/package/SpatialAudio.zip`](./src/package/SpatialAudio/package/SpatialAudio.zip) via your root manager.
 5. Reboot to activate all optimizations across memory, thermals, graphics, and audio.
 
 ### Method 2: ROM Integration (Device & Vendor Trees)
@@ -299,14 +313,14 @@ For permanent build integration:
 
    ```bash
    cd /path/to/device_xiaomi_everpal
-   git apply /path/to/EvergoTweaks/package/MemoryMgmt/patch.patch
+   git apply /path/to/EverpalTweaks/src/package/MemoryMgmt/patch.patch
    ```
 
 2. **Apply Thermal Patch:**
 
    ```bash
    cd /path/to/device_xiaomi_everpal
-   git apply /path/to/EvergoTweaks/package/ThermalMgmt/patch.patch
+   git apply /path/to/EverpalTweaks/src/package/ThermalMgmt/patch.patch
    ```
 
 3. In `vendor/xiaomi/everpal`: Replace `thermal-normal.conf` with `thermal-nolimits.conf`.
@@ -315,7 +329,7 @@ For permanent build integration:
 
    ```bash
    cd /path/to/device_xiaomi_everpal
-   git apply /path/to/EvergoTweaks/package/SpatialAudio/patch.patch
+   git apply /path/to/EverpalTweaks/src/package/SpatialAudio/patch.patch
    ```
 
 </details>

@@ -18,4 +18,6 @@ desktop.ini
 *logcat*.txt
 __pycache__/
 /docs/
+/src/docs/
+embed
 

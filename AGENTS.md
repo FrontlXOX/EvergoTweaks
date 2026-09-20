@@ -1,17 +1,17 @@
-# AGENTS.md — EvergoTweaks Optimization Suite
+# AGENTS.md — EverpalTweaks Optimization Suite
 
-> **AI Agent Context & Master Operational Specification for EvergoTweaks**
-> Target Device: **Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal` / `evergo`)**
+> **AI Agent Context & Master Operational Specification for EverpalTweaks**
+> Target Device: **Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal`)**
 > Target SoC: **MediaTek Dimensity 810 5G (MT6833P / MT6833 family)**
 > Target OS: **Android 16** (Project Infinity / LineageOS 23.0 base)
 > Target Kernel: **Linux 4.14.357-Aqua #3 SMP PREEMPT**
-> Primary Remote: `https://github.com/FrontlXOX/EvergoTweaks`
+> Primary Remote: `https://github.com/FrontlXOX/EverpalTweaks`
 
 ---
 
 ## 1. Project Purpose & System Identity
 
-**EvergoTweaks** is an empirically audited, hardware-verified optimization suite developed to resolve custom ROM performance degradation, thermal throttling, and aggressive background process termination on the Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal` / `evergo`).
+**EverpalTweaks** is an empirically audited, hardware-verified optimization suite developed to resolve custom ROM performance degradation, thermal throttling, and aggressive background process termination on the Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal`).
 
 This repository maintains two production-grade subsystems:
 
@@ -73,7 +73,7 @@ On the 4GB MT6833/MT6833P architecture, physical RAM is segmented into three ker
 
 #### Production Solution & Tunables
 
-Applied via `package/MemoryMgmt/patch.patch` (`device_xiaomi_everpal`) and `package/MemoryMgmt/package/MemoryMgmt.zip`:
+Applied via `src/package/MemoryMgmt/patch.patch` (`device_xiaomi_everpal`) and `src/package/MemoryMgmt/package/MemoryMgmt.zip`:
 
 - **Adaptive ZRAM Scaling:** Scaled dynamically to 100% of MemTotal on 4GB variants (**3.58 GB** / `3,758,096,384` bytes) and 75% of MemTotal on 6GB (~4.2 GB) and 8GB (~5.6 GB) variants using single-pass `lz4` compression with dynamic `max_comp_streams = $(nproc)` (8 parallel streams).
 - **Watermark Factor:** Scaled down to `vm.watermark_scale_factor = 20` (prevents false-positive direct reclaim storms across all zones).
@@ -85,7 +85,7 @@ Applied via `package/MemoryMgmt/patch.patch` (`device_xiaomi_everpal`) and `pack
 
 ---
 
-### B. Thermal Subsystem (`package/ThermalMgmt/`)
+### B. Thermal Subsystem (`src/package/ThermalMgmt/`)
 
 #### The Xiaomi Joyose Dependency & AES-128-CBC Cipher
 
@@ -97,7 +97,7 @@ Xiaomi MT6833 stock firmware relies on `mi_thermald` interacting with a propriet
 
 #### Production Solution (`sconfig 10` & Hardware Compute Master v2.4)
 
-Applied via `package/ThermalMgmt/patch.patch` and `package/ThermalMgmt/package/ThermalMgmt.zip`:
+Applied via `src/package/ThermalMgmt/patch.patch` and `src/package/ThermalMgmt/package/ThermalMgmt.zip`:
 
 - Enforces `sconfig 10` (`thermal-mgame.conf` / `thermal-nolimits.conf`), shifting the thermal throttling ceiling from **36°C to 55°C**.
 - Below 55°C, thermal governor applies zero throttling, allowing Cortex-A76 Big Cores to pin at sustained **2.40 GHz** and Cortex-A55 to pin at **2.00 GHz**. The `862000` / `898000` kHz targets in `thermal-nolimits.conf` represent the safety floor _only if_ temperatures breach 55°C.
@@ -115,7 +115,7 @@ Applied via `package/ThermalMgmt/patch.patch` and `package/ThermalMgmt/package/T
 
 ---
 
-### C. Graphics & Vulkan Subsystem (`package/Vulkan13/`)
+### C. Graphics & Vulkan Subsystem (`src/package/Vulkan13/`)
 
 #### The Split-Driver Synchronization Problem
 
@@ -130,7 +130,7 @@ ARM Mali GPUs require strict synchronization between the user-space driver (`vul
 
 ---
 
-### D. Spatial Audio Subsystem (`package/SpatialAudio/`)
+### D. Spatial Audio Subsystem (`src/package/SpatialAudio/`)
 
 #### The Routing Storm & HAL Misalignment
 On Android 16, connecting wired headsets triggered an aggressive create/releaseAudioPatch loop (~20 round-trips/min) and Downmix_Configure errors. Root causes:
@@ -140,7 +140,7 @@ On Android 16, connecting wired headsets triggered an aggressive create/releaseA
 4. MediaTek audio HAL crashed trying to calibrate missing ultrasound proximity hardware (`ro.vendor.audio.us.proximity=true`).
 
 #### Production Solution
-Applied via `package/SpatialAudio/patch.patch` and `package/SpatialAudio/package/SpatialAudio.zip`:
+Applied via `src/package/SpatialAudio/patch.patch` and `src/package/SpatialAudio/package/SpatialAudio.zip`:
 - Enforces `maxOpenCount="1" maxActiveCount="1"` on `immersive_out` and adds `5POINT1` / `7POINT1` channel masks.
 - Decouples Dolby DAP / DVL into per-session stream postprocessors (`music`, `ring`, `alarm`, `notification`, `voice_call`), keeping the spatializer thread clean.
 - Sets `persist.vendor.audio.spatializer.speaker_enabled=false`, `ro.audio.spatializer.headtracking_supported=false`, `ro.audio.monitorRotation=false`, and `ro.vendor.audio.us.proximity=false`.
@@ -153,7 +153,7 @@ Applied via `package/SpatialAudio/patch.patch` and `package/SpatialAudio/package
 
 These verified numbers represent the ground truth performance achievable with this repository:
 
-| Benchmark                     |   Pure Stock AOSP   | Memory Management Alone | EvergoTweaks (Thermal + Memory Management) | Verified Deltas                                   |
+| Benchmark                     |   Pure Stock AOSP   | Memory Management Alone | EverpalTweaks (Thermal + Memory Management) | Verified Deltas                                   |
 | :---------------------------- | :-----------------: | :---------------------: | :----------------------------------------: | :------------------------------------------------ |
 | **Geekbench 7 Multi-Core**    |       `1,500`       |         `1,788`         |                **`2,133`**                 | 🚀 **+42.2% (+633 pts — Global MT6833 Record)**   |
 | **Geekbench 7 Single-Core**   |        `610`        |          `578`          |                 **`729`**                  | 🚀 **+19.5% (+119 pts — Global MT6833 Record)**   |
@@ -177,10 +177,10 @@ These verified numbers represent the ground truth performance achievable with th
 
 ## 5. Repository Layout & File Catalog
 
-All required automation and operational Python scripts reside **exclusively** in the root `scripts/` directory:
+All required automation and operational Python scripts reside **exclusively** in the root `src/scripts/` directory:
 
 ```text
-EvergoTweaks/
+EverpalTweaks/
 ├── AGENTS.md                          # Master context & AI operational instructions (This file)
 ├── README.md                          # Public repository overview & quickstart guide
 ├── CHANGELOG.md                       # Comprehensive version history & benchmark progression
@@ -257,26 +257,26 @@ EvergoTweaks/
 To rebuild all KernelSU/Magisk modules and verify their zip integrity:
 
 ```bash
-python scripts/builder.py --all
+python src/scripts/builder.py --all
 ```
 
 Or rebuild individual modules:
 
 ```bash
-python scripts/builder.py --memory
-python scripts/builder.py --thermal
-python scripts/builder.py --vulkan
-python scripts/builder.py --spatial
+python src/scripts/builder.py --memory
+python src/scripts/builder.py --thermal
+python src/scripts/builder.py --vulkan
+python src/scripts/builder.py --spatial
 ```
 
-_Note: Flashable zips are always written exclusively to `package/<Module>/package/`._
+_Note: Flashable zips are always written exclusively to `src/package/<Module>/package/`._
 
 ### Auditing Connected Device via ADB
 
 Run a full hardware, Vulkan 1.3, frequency, thermal, and kernel tunable audit:
 
 ```bash
-python scripts/verifydevice.py
+python src/scripts/verifydevice.py
 ```
 
 ### Automated Benchmark Execution with Live Telemetry
@@ -285,13 +285,13 @@ Run the automated Geekbench 7 benchmark suite with real-time CLI clock & workloa
 
 ```bash
 # Run both CPU and GPU (Vulkan) benchmarks
-python scripts/autobench.py
+python src/scripts/autobench.py
 
 # Run CPU benchmark only
-python scripts/autobench.py --cpu-only
+python src/scripts/autobench.py --cpu-only
 
 # Run GPU Vulkan benchmark only
-python scripts/autobench.py --gpu-only
+python src/scripts/autobench.py --gpu-only
 ```
 
 ### Decrypting / Inspecting Xiaomi Thermal Profiles
@@ -299,13 +299,13 @@ python scripts/autobench.py --gpu-only
 Decrypt a single thermal configuration:
 
 ```bash
-python scripts/decrypt_thermal.py package/ThermalMgmt/docs/vendor_configs/thermal-normal.conf
+python src/scripts/decrypt_thermal.py src/package/ThermalMgmt/docs/vendor_configs/thermal-normal.conf
 ```
 
 Batch decrypt all vendor profiles:
 
 ```bash
-python scripts/decrypt_thermal.py --batch package/ThermalMgmt/docs/vendor_configs/
+python src/scripts/decrypt_thermal.py --batch src/package/ThermalMgmt/docs/vendor_configs/
 ```
 
 ### Pulling Live Benchmark Results via ADB
@@ -313,7 +313,7 @@ python scripts/decrypt_thermal.py --batch package/ThermalMgmt/docs/vendor_config
 Extract Geekbench 7 CPU & GPU and 3DMark Sling Shot Extreme scores directly from on-device SQLite databases:
 
 ```bash
-python scripts/benchpull.py
+python src/scripts/benchpull.py
 ```
 
 ### Submodule Synchronization (GitHub FrontlXOX)
@@ -321,7 +321,7 @@ python scripts/benchpull.py
 Sync all submodules directly into GitHub forks using the automated synchronizer:
 
 ```bash
-python scripts/synctrees.py
+python src/src/scripts/synctrees.py
 ```
 
 Or via PowerShell:
@@ -365,7 +365,7 @@ git commit -m "♻️ [REFACTOR]: update vendor thermal conf parsing script"
 
 # Push and release:
 git push origin main
-glab release create v1.0.0 "package/MemoryMgmt/package/MemoryMgmt.zip#MemoryMgmt.zip" "package/ThermalMgmt/package/ThermalMgmt.zip#ThermalMgmt.zip" --name "v1.0.0 - Release"
+glab release create v1.0.0 "src/package/MemoryMgmt/package/MemoryMgmt.zip#MemoryMgmt.zip" "src/package/ThermalMgmt/package/ThermalMgmt.zip#ThermalMgmt.zip" --name "v1.0.0 - Release"
 ```
 
 ---
@@ -377,15 +377,15 @@ All agents working within this codebase must strictly observe these rules:
 1. 🛑 **Zero Unprompted Reboots:** NEVER execute `adb reboot` or issue reboot commands without explicit, written user permission.
 2. 🛑 **No Kernel Spinloops:** NEVER write to `/proc/driver/thermal/set_sspm_big_limit_threshold`. It causes an unkillable 84% CPU kernel IPI spinloop.
 3. 🛑 **No Backlight Tampering:** NEVER alter `mtk-cl-backlight` cooling levels in thermal configs. Doing so forces PWM brightness to 0, causing permanent black screens on lock/unlock.
-4. 🛑 **Zip Placement Boundary:** Builder-produced EvergoTweaks flashable `.zip` archives must reside **exclusively** inside their respective `package/` directories (`package/MemoryMgmt/package/`, `package/ThermalMgmt/package/`, `package/Vulkan13/package/`, and `package/SpatialAudio/package/`). The sole sanctioned exception is the curated root `modules/` third-party companion collection (root/LSPosed/Zygisk/ReSukiSU tooling flashed alongside EvergoTweaks). Never place `.zip` files elsewhere in the repository root or script directories.
-5. 🛑 **Scripts Centralization Boundary:** All required Python automation, build, extraction, and verification scripts must reside **exclusively** in the root `scripts/` folder. Do not create or reintroduce scripts inside `package/*/scripts/`. The sole sanctioned exception is the third-party `modules/ResukiSU/` repack tooling (`main.py` + `python/` helpers), which ships verbatim as part of that companion module.
+4. 🛑 **Zip Placement Boundary:** Builder-produced EverpalTweaks flashable `.zip` archives must reside **exclusively** inside their respective `src/package/` directories (`src/package/MemoryMgmt/package/`, `src/package/ThermalMgmt/package/`, `src/package/Vulkan13/package/`, and `src/package/SpatialAudio/package/`). The sole sanctioned exception is the curated root `src/modules/` third-party companion collection (root/LSPosed/Zygisk/ReSukiSU tooling flashed alongside EverpalTweaks). Never place `.zip` files elsewhere in the repository root or script directories.
+5. 🛑 **Scripts Centralization Boundary:** All required Python automation, build, extraction, and verification scripts must reside **exclusively** in the root `src/scripts/` folder. Do not create or reintroduce scripts inside `package/*/scripts/`. The sole sanctioned exception is the third-party `src/modules/ResukiSU/` repack tooling (`main.py` + `python/` helpers), which ships verbatim as part of that companion module.
 6. 🛑 **No Secrets or Bloat:** Never commit `.env` files, API tokens, local OS metadata (`.DS_Store`, `Thumbs.db`), Python caches (`__pycache__`), or SQLite WAL journal files.
 7. 🛑 **Attribution Integrity:**
    - Magisk / KernelSU modules must maintain `author=FrontlXOX` strictly inside `module.prop`.
    - General project authorship and maintainership belongs to `Author & Maintainer: Shovit Dutta`.
    - Architectural and research credits honor: `Special Thanks & Collaborators: Addster09 x himanshuksr0007 (Goku)`.
    - Under NO circumstances should `FrontlXOX` be listed under Authors & Credits in documentation (project authorship belongs to Shovit Dutta).
-8. 🔄 **Benchmark URL Maintenance:** Whenever a new peak record run is achieved, always update the official side-by-side comparison URL (`https://browser.geekbench.com/v7/cpu/compare/<NEW_RECORD_ID>?baseline=380539`) across all documentation markdown files (`README.md`, `AGENTS.md`, `package/ThermalMgmt/README.md`).
-9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\Evergo\EvergoTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
-10. 🐙 **GitHub Primacy (FrontlXOX):** All project hosting, trees, forks, releases, and collaborator cherry-picks reside exclusively on **GitHub** under `https://github.com/FrontlXOX/` (`EvergoTweaks`, `device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`). GitLab has been completely deprecated per user directive.
-11. 🌲 **Submodule GitHub Tracking:** All submodules in `trees/` track their respective GitHub forks under `FrontlXOX` as remote `origin`. Upstream synchronization (`scripts/synctrees.py`) pushes directly to `origin` on GitHub.
+8. 🔄 **Benchmark URL Maintenance:** Whenever a new peak record run is achieved, always update the official side-by-side comparison URL (`https://browser.geekbench.com/v7/cpu/compare/<NEW_RECORD_ID>?baseline=380539`) across all documentation markdown files (`README.md`, `AGENTS.md`, `src/package/ThermalMgmt/README.md`).
+9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\Evergo\EverpalTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
+10. 🐙 **GitHub Primacy (FrontlXOX):** All project hosting, trees, forks, releases, and collaborator cherry-picks reside exclusively on **GitHub** under `https://github.com/FrontlXOX/` (`EverpalTweaks`, `device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`). GitLab has been completely deprecated per user directive.
+11. 🌲 **Submodule GitHub Tracking:** All submodules in `src/trees/` track their respective GitHub forks under `FrontlXOX` as remote `origin`. Upstream synchronization (`src/scripts/synctrees.py`) pushes directly to `origin` on GitHub.

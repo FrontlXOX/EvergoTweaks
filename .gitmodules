@@ -1,26 +1,25 @@
-[submodule "trees/device_xiaomi_everpal"]
-	path = trees/device_xiaomi_everpal
+[submodule "src/trees/device_xiaomi_everpal"]
+	path = src/trees/device_xiaomi_everpal
 	url = https://github.com/FrontlXOX/device_xiaomi_everpal.git
 	branch = lineage-23.2
 	ignore = dirty
-[submodule "trees/vendor_xiaomi_everpal"]
-	path = trees/vendor_xiaomi_everpal
+[submodule "src/trees/vendor_xiaomi_everpal"]
+	path = src/trees/vendor_xiaomi_everpal
 	url = https://github.com/FrontlXOX/vendor_xiaomi_everpal.git
 	branch = lineage-23.2
 	ignore = dirty
-[submodule "trees/kernel"]
-	path = trees/kernel
+[submodule "src/trees/kernel"]
+	path = src/trees/kernel
 	url = https://github.com/FrontlXOX/android_kernel_xiaomi_mt6833.git
 	branch = lineage-24.0
 	ignore = dirty
-[submodule "trees/upstream-device"]
-	path = trees/upstream-device
+[submodule "src/trees/upstream-device"]
+	path = src/trees/upstream-device
 	url = https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal.git
 	branch = lineage-23.2
 	ignore = dirty
-[submodule "trees/kernel-5.10"]
-	path = trees/kernel-5.10
+[submodule "src/trees/kernel-5.10"]
+	path = src/trees/kernel-5.10
 	url = https://github.com/MillenniumOSS/kernel_millennium_mt6789-common.git
 	branch = vic
 	ignore = dirty
-

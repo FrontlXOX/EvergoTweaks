@@ -1,0 +1,7 @@
+#!/sbin/sh
+# Magisk / KernelSU / APatch module installer stub
+umask 022
+SKIPUNZIP=1
+unzip -o "$ZIPFILE" -x 'META-INF/*' -d "$MODPATH" >&2
+set_perm_recursive "$MODPATH" 0 0 0755 0644
+set_perm "$MODPATH/service.sh" 0 0 0755

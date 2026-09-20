@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to **EvergoTweaks** are documented in this file.
+All notable changes to **EverpalTweaks** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to Semantic Versioning.
 
 ## [v1.2.0] - 2026-09-20
@@ -8,11 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### 🏆 Milestone Achievements
 
 - **Decoupled Dual-Runtime Architecture (`libge2.so`):**
-  - Completely isolated the Valhall r49p1 Vulkan 1.3 runtime into a dedicated companion library ([`libge2.so`](file:///D:/Evergo/EvergoTweaks/package/templates/Vulkan13/system/vendor/lib64/libge2.so)), updating `DT_NEEDED` and `DT_SONAME` across both 64-bit and 32-bit `libVK13_mali.so` binaries.
+  - Completely isolated the Valhall r49p1 Vulkan 1.3 runtime into a dedicated companion library ([`libge2.so`](file:///D:/Evergo/EverpalTweaks/package/templates/Vulkan13/system/vendor/lib64/libge2.so)), updating `DT_NEEDED` and `DT_SONAME` across both 64-bit and 32-bit `libVK13_mali.so` binaries.
   - Preserves untouched stock `/vendor/lib64/libged.so` (58 KB) for SurfaceFlinger, Bootanimation, and Zygote, completely eliminating the OpenGL ES initialization collision that caused boot animation hangs on Linux 4.14 kernel ioctls.
   - Delivers all required frame watchdog symbols (`ged_fr_swd_frame_destroy` and `ged_fr_swd_mark_frame`) to Vulkan 1.3 workloads with 100% compositor and system stability.
 - **SELinux AVC Denial Neutralization & Early Boot Hardening:**
-  - Injected dedicated root [`sepolicy.rule`](file:///D:/Evergo/EvergoTweaks/package/templates/Vulkan13/sepolicy.rule) allowing `surfaceflinger`, `appdomain`, and `hal_graphics_allocator_default` full `{ read open getattr execute map }` on `vendor_file` and `same_process_hal_file` under OverlayFS mounts.
+  - Injected dedicated root [`sepolicy.rule`](file:///D:/Evergo/EverpalTweaks/package/templates/Vulkan13/sepolicy.rule) allowing `surfaceflinger`, `appdomain`, and `hal_graphics_allocator_default` full `{ read open getattr execute map }` on `vendor_file` and `same_process_hal_file` under OverlayFS mounts.
   - Removed legacy `magiskpolicy --live` from `post-fs-data.sh` to prevent user-space policy corruption on Android 16 SELinux policy version 34.
   - Shipped `vulkan.mt6833.so` dual-alias in `/vendor/lib(64)/hw/` resolving Android HAL search fallbacks instantly.
 - **Empirical Hardware Diagnostics & Telemetry (Vulkan Checker):**
@@ -21,7 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - **Modern Extension Support:** **`VK_KHR_dynamic_rendering`** (PASSED) and **`VK_KHR_push_descriptor`** (PASSED).
   - **VulkanMod (Minecraft / Pojav):** **`100% PASSED`**.
 - **Master Archival Documentation:**
-  - Generated complete session engineering transcript ([`docs/SESSION_TRANSCRIPT.md`](file:///D:/Evergo/EvergoTweaks/docs/SESSION_TRANSCRIPT.md)) and compressed binary log archive ([`docs/transcript_archive.jsonl.gz`](file:///D:/Evergo/EvergoTweaks/docs/transcript_archive.jsonl.gz)).
+  - Generated complete session engineering transcript ([`docs/SESSION_TRANSCRIPT.md`](file:///D:/Evergo/EverpalTweaks/docs/SESSION_TRANSCRIPT.md)) and compressed binary log archive ([`docs/transcript_archive.jsonl.gz`](file:///D:/Evergo/EverpalTweaks/docs/transcript_archive.jsonl.gz)).
 
 ---
 
@@ -44,8 +44,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Proved that Mali-G57 (Valhall v1) operates exclusively on the **Job Manager (JM)** interface (`BASE_UK_VERSION_MAJOR 11`), meaning CSF firmware is not required.
   - Diagnosed and resolved the 4 fatal blockers when compiling 5.10 Mali drivers on 4.14: `access_ok` argument shift, ION vs `dma_heap`, `dma_fence` APIs, and MediaTek `platform/mt6833/` power/clock glue.
 - **Unified Automation, Multi-Run Benchmark Extraction & Repo Cleanup:**
-  - Enhanced [`scripts/build_all.py`](file:///D:/Evergo/EvergoTweaks/scripts/build_all.py) to build and CRC-32 verify all 3 flashable modules (`MemoryMgmt.zip`, `ThermalMgmt.zip`, `Vulkan13-KernelSU.zip`) simultaneously.
-  - Enhanced [`scripts/pull_benchmark.py`](file:///D:/Evergo/EvergoTweaks/scripts/pull_benchmark.py) to pull, parse, and log all concurrent 3DMark benchmark runs (OpenGL ES and Vulkan) directly from on-device SQLite storage.
+  - Enhanced [`scripts/build_all.py`](file:///D:/Evergo/EverpalTweaks/scripts/build_all.py) to build and CRC-32 verify all 3 flashable modules (`MemoryMgmt.zip`, `ThermalMgmt.zip`, `Vulkan13-KernelSU.zip`) simultaneously.
+  - Enhanced [`scripts/pull_benchmark.py`](file:///D:/Evergo/EverpalTweaks/scripts/pull_benchmark.py) to pull, parse, and log all concurrent 3DMark benchmark runs (OpenGL ES and Vulkan) directly from on-device SQLite storage.
   - Purged 19.35 GB of obsolete extraction dumps and temporary scratch files, keeping the repository completely lean.
 
 ---
@@ -98,12 +98,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### 🛠️ Repository Centralization & Automation Tooling
 
-- **Centralized Root Tooling:** Consolidated all Python scripts exclusively in the root [`scripts/`](file:///D:/Evergo/EvergoTweaks/scripts/) directory; eliminated all nested subproject script copies.
-- **Real-Time Automated Geekbench 7 Suite ([`scripts/autobench.py`](file:///D:/Evergo/EvergoTweaks/scripts/autobench.py)):**
+- **Centralized Root Tooling:** Consolidated all Python scripts exclusively in the root [`scripts/`](file:///D:/Evergo/EverpalTweaks/scripts/) directory; eliminated all nested subproject script copies.
+- **Real-Time Automated Geekbench 7 Suite ([`scripts/autobench.py`](file:///D:/Evergo/EverpalTweaks/scripts/autobench.py)):**
   - Streamlined benchmark automation for both CPU and GPU (OpenCL).
   - Real-time terminal telemetry showing live test phases, workload names, execution durations, CPU frequencies, GPU clocks, and thermal dissipation.
   - Permanently resolved the double-tap cancellation bug.
-- **Unified Module Builder ([`scripts/build_all.py`](file:///D:/Evergo/EvergoTweaks/scripts/build_all.py)):**
+- **Unified Module Builder ([`scripts/build_all.py`](file:///D:/Evergo/EverpalTweaks/scripts/build_all.py)):**
   - Single-command build and CRC-32 verification for both `MemoryMgmt.zip` and `ThermalMgmt.zip`.
 
 ---
@@ -135,7 +135,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Elevated `[NL-MONITOR-BOOST_LIMIT]` (58°C trig / 55°C clr) and `[NL-MONITOR-BATTERY-TEMP_STATE]` (55°C–58°C trig / 53°C–56°C clr).
   - Eliminates the hidden 51°C emergency thermal trigger (`temp_state 12300001`), maintaining sustained 2.4 GHz Big core and 2.0 GHz Little core clocks across back-to-back runs.
 - **Audit Tooling Upgrade:**
-  - Updated [`scripts/verify_device.py`](file:///D:/Evergo/EvergoTweaks/scripts/verify_device.py) to audit live DVFSRC LPDDR4X frequency and Vcore voltage.
+  - Updated [`scripts/verify_device.py`](file:///D:/Evergo/EverpalTweaks/scripts/verify_device.py) to audit live DVFSRC LPDDR4X frequency and Vcore voltage.
 
 ---
 
@@ -158,7 +158,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Delayed Background Re-Enforcement:**
   - Added a background subshell at `sleep 25` to re-assert all locks and tunables after late-stage Android vendor HAL initialization finishes.
 - **Tooling & Audit Suite:**
-  - Upgraded [`scripts/verify_device.py`](file:///D:/Evergo/EvergoTweaks/scripts/verify_device.py) to audit CoreLink CCI Mode lock, UFS storage scheduler, and TCP slow start after idle.
+  - Upgraded [`scripts/verify_device.py`](file:///D:/Evergo/EverpalTweaks/scripts/verify_device.py) to audit CoreLink CCI Mode lock, UFS storage scheduler, and TCP slow start after idle.
 
 ---
 

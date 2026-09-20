@@ -176,6 +176,7 @@ EvergoTweaks/
 ├── trees/                             # 🌲 Dual-Remote Git Submodules (Upstream GitHub + GitLab Forks)
 │   ├── device_xiaomi_everpal/         # Addster09 / ShovitDutta1 device tree (lineage-23.2)
 │   ├── kernel/                        # Addster09 / ShovitDutta1 Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
+│   ├── kernel-5.10/                   # MediaTek 5.10 GKI donor kernel (vic, mt6789/mt6833 sibling)
 │   ├── upstream-device/               # xiaomi-mt6833-dev / ShovitDutta1 reference tree (vulkan-1.3)
 │   └── vendor_xiaomi_everpal/         # xiaomi-mt6833-dev / ShovitDutta1 vendor blobs (vulkan-1.3)
 │
@@ -353,6 +354,6 @@ All agents working within this codebase must strictly observe these rules:
    - Under NO circumstances should `TesterProd` be listed under Authors & Credits in documentation.
 8. 🔄 **Benchmark URL Maintenance:** Whenever a new peak record run is achieved, always update the official side-by-side comparison URL (`https://browser.geekbench.com/v7/cpu/compare/<NEW_RECORD_ID>?baseline=380539`) across all documentation markdown files (`README.md`, `AGENTS.md`, `package/ThermalMgmt/README.md`).
 9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\Evergo\EvergoTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
-10. 🦊 **GitLab Primacy:** Always maintain **GitLab** (`https://gitlab.com/ShovitDutta1/`) as the primary hosting and collaboration forge for EvergoTweaks and its associated trees (`device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`). All forks, branches, releases, and collaborator links must prioritize GitLab.
+10. 🦊 **GitLab Primacy:** Always maintain **GitLab** (`https://gitlab.com/ShovitDutta1/`) as the primary hosting and collaboration forge for EvergoTweaks and its associated trees (`device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`, `android_kernel_mediatek_5.10`). All forks, branches, releases, and collaborator links must prioritize GitLab.
 11. 🌲 **Dual-Remote Submodule Integrity:** All submodules in `trees/` must preserve their dual-remote configuration (`origin` pointing to upstream GitHub, `gitlab` pointing to `https://gitlab.com/ShovitDutta1/`). Upstream synchronization must always fetch/pull from GitHub (`origin`) and push to GitLab (`gitlab`).
 

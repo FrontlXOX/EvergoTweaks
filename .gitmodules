@@ -18,3 +18,8 @@
 	url = https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal.git
 	branch = lineage-23.2
 	ignore = dirty
+[submodule "trees/kernel-5.10"]
+	path = trees/kernel-5.10
+	url = https://gitlab.com/ShovitDutta1/android_kernel_mediatek_5.10.git
+	branch = vic
+	ignore = dirty

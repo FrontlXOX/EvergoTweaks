@@ -120,6 +120,65 @@ If all match §3, you are at the same point we were on Windows. Proceed to §5.
 
 ---
 
+## 4b. 5.10 Port Manifest (Windows-verified 2026-09-21 — thinker to builder)
+
+> Builder: execute in listed order. All source paths are 4.14 Aqua (`src/trees/kernel`, submodule `FrontlXOX/android_kernel_xiaomi_mt6833`, branch `lineage-24.0`); all target paths are the NEW tree branched from 5.10 donor (`src/trees/kernel-5.10`, submodule `MillenniumOSS/kernel_millennium_mt6789-common`, branch `vic`). NEVER commit tree edits to the superproject — trees are submodules (`ignore = dirty`); new-tree work lives in its own repo/branch (`android_kernel_xiaomi_everpal-5.10`, branch `everpal-5.10`). Every row below was verified read-only on Windows — receipts included.
+
+### P0 — Boot set (no boot without these)
+
+| # | What | Source (4.14, verified) | Target (5.10) | Action |
+|---|------|------------------------|---------------|--------|
+| 1 | k16a display panels | `drivers/gpu/drm/panel/panel-k16a-36-02-0a-vdo.c` + `panel-k16a-42-02-0b-vdo.c` (+Kconfig/Makefile entries, `everpal_defconfig:327-329` `DRM_PANEL_K16A_*=y` + `LCM_CUST_COMMON=y` + `VIRTUAL_VDO=y`) | `drivers/gpu/drm/panel/` + Kconfig | PORT both drivers + symbols. Receipt: both files exist in 4.14; 5.10 has zero `K16A` (only `panel-truly-*`). Note 5.10 DRM is slim upstream V2 (~20 files, no `mtk_panel_ext`/writeback) — adapt panel glue, do not copy the whole 4.14 `drm/mediatek` fork (100+ files). |
+| 2 | Board DTS | `arch/arm64/boot/dts/mediatek/evergo.dts` (651 lines, `Copyright XiaoMi 2021`): `dsi0` panel1 `k16a_36_02_0a_vdo` + panel2 `k16a_42_02_0b_vdo` (pm pio136, bl pio87, rst pio86, bias pio137/138, `lcd_dvdd=mt_pmic_vcn13`, L347-382), `fpsensor_fp_eint` pio18 (L633-641), includes `cust_evergo_camera` + `evergo/cust.dtsi` + `sia81xx` + `sc8551` + `ln8000` + `irtx_led` (L643-649) | New `arch/arm64/boot/dts/mediatek/mt6833-everpal.dts` on 5.10 `mt6833.dts` base + `Makefile` `dtb-y` entry | PORT + ADAPT. SoC base differs (4.14: mcupm/dvfsp/eem/upower/ion-carveout; 5.10: scpsys/dvfsrc/ssmr/lastbus/dfd) — keep everpal nodes (DSI/panel/fpsensor/accdet/mt6360 intr pio10-11), drop legacy SoC nodes. Receipt: 5.10 `Makefile` lists only `mt6789.dtb` (L17) — you must add the new dtb or nothing compiles it. `evergo/cust.dtsi` + `k6833v1_64/cust.dtsi` resolve to zero files repo-wide (external vendor overlay) — recreate minimal or stub, never block on them. |
+| 3 | Board overlay + touch/camera DTS | `k6833v1_64.dts` (330, plugin: chosen videolfb, mt6360, LCD bias/RST/TE, dsi0, accdet, GPS) + `cust_mt6833_touch_*.dtsi` (8 variants: nt36xxx/nt36672c_1080x2400/ilitek9882/ft3518_1080x2400/alpha_720x1600/120hz/1080x2300/1080x2280) + `cust_mt6833_msdc` + `cust_mt6833_camera` + `cust_mt6833_alpha_camera` + `cust_mt6833v1_64_mt6317_camera` + `cust_evergo_camera.dtsi` + `sia81xx.dtsi` | Same DTS dir in new tree | PORT. Receipt: 5.10 keeps only 2 `cust_mt6833_for_6789_touch_*` + `cust_mt6833_msdc/camera` — the 6 everpal touch variants, alpha/mt6317 camera, `cust_evergo_camera`, `sia81xx` are absent. |
+| 4 | Battery tables | `bat_setting/mt6833_battery_table2.dtsi` + `mt6833_battery_table.dtsi` + `mt6833_battery_prop.dtsi` + `mt6833_battery_prop_dim2_ext.dtsi` + `battery_S98016_CWD_4V45_5000mah.dtsi` + `battery_S98016_CMX_4V45_5000mah.dtsi` | Same dir in new tree | PORT all six. Receipt: 4.14 list confirmed; 5.10 has `mt6833_battery_*` but not `table2` nor `S98016` 5000mAh. |
+| 5 | Touch framework | `drivers/input/touchscreen/mediatek/*` (14 files: `mtk_tpd.c`, `tpd_setting.c`, `pd_*.c/h`, Makefile, Kconfig) | `drivers/input/touchscreen/mediatek/` (absent in 5.10) | PORT framework OR adapt board to upstream `goodix.c` — your call on Linux after reading both. Receipt: 4.14 dir listed; 5.10 has no `mediatek*` under touchscreen. 5.10 DTS has only `touch compatible="goodix,touch"` stub. Defconfig touch string is identical both sides (`GT9886 GT9896S NT36672C`), so Kconfig needs no change, driver backend does. |
+| 6 | Audio machine (rename, NOT copy) | `sound/soc/mediatek/mt6833/mt6833-mt6359.c` (1226 lines, `#include ../../codecs/mt6359.h`, `everpal_defconfig:344` `SND_SOC_MT6833_MT6359=y` + `:106/:304` `MT6359P` PMIC/regulator) | Existing 5.10 `sound/soc/mediatek/mt6833/mt6833-mt6359p.c` (1228 lines, `compatible="mediatek,mt6833-mt6359p-sound"`) | RENAME/ADAPT in place: `compatible` → `mt6833-mt6359p-sound`, enable `SND_SOC_MT6359P_ACCDET=m` (`mgk_64_k510_defconfig:237` already has it) + `SND_SOC_MT6833_MT6359P=m` (`:241`), handle `y`→`m` load order (ramdisk). Same MT6359P silicon both sides — Kconfig rename, not new HW. Amp tables differ (`SIA8109/AW87XXX/RT5509` vs `RT5512`) — port `sia81xx.dtsi` with row 3. |
+| 7 | Defconfig fragment | `arch/arm64/configs/everpal_defconfig` (487 lines): `:44` `MACH_MT6833=y`, `:67-68` `APPENDED_DTB_IMAGE(_NAMES=mediatek/mt6833)`, `:100-101` `MTK_PLATFORM="mt6853"` + `ARCH_MTK_PROJECT="k6833v1_64"`, `:158` `CONSYS_6833=y`-only, `:168` `MD1=22`, `:166` `FM MT6631`, `:224` `GPU_VERSION r44p0`, `:344` audio, `:327-329` panels, `:419-420` `ION/MTK_ION=y`, `:65` CMDLINE | New `arch/arm64/configs/everpal_5.10_defconfig` based on `mgk_64_k510_defconfig` (604 lines) | ADAPT, never copy: keep `MTK_GPU_MT6833_SUPPORT=m` (`:218`), `SND_SOC_MT6833(_MT6359P)=m` (`:240-241`), `DMABUF_HEAPS_MTK_MM/SYSTEM/DEBUG=m` (`:15-17`, ION replacement — decide ION-shim vs dmabuf migrate), touch string (`:106`), `MT6360` family (`=m` vs 4.14 `=y`). Drop `MACH_*`/`MTK_PLATFORM`/`GPU_VERSION` string style (absent in 5.10 by design). Re-add single-chip `CONSYS_6833` preference, `MD1`, FM chip, CMDLINE per board need. |
+| 8 | Conflict cleanup | — | `drivers/gpu/mediatek/gpu_mali/mali_valhall/mali-r32p1/drivers/gpu/arm/midgard/csf/ipa_control/mali_kbase_csf_ipa_control.c:278,327,384` | RESOLVE 3x `<<<<<<< HEAD` markers BEFORE first build. Receipt: grep-confirmed on Windows. (CSF unused on G57/JM — resolve by keeping donor side, do not delete the file.) |
+| 9 | Git hygiene | — | `src/trees/kernel-5.10` (`vic`, shallow/grafted 1 commit, 13 dirty: `include/uapi/linux/netfilter/*`, `net/netfilter/xt_*`, `tools/memory-model/litmus`) | `fetch --unshallow`, `checkout --` the 13 dirty files, THEN `checkout -b everpal-5.10 vic`. Never branch dirty/shallow. |
+
+### P1 — Post-boot features (boot first, then these)
+
+| # | What | Source (4.14) | Target | Action |
+|---|------|---------------|--------|--------|
+| 10 | Fingerprint | `drivers/input/fingerprint/fpc1542/mtk_spi.c` + `goodix/gf_spi_tee.c` (+Kconfig/Makefile) | `drivers/input/fingerprint/` (entire dir absent in 5.10) | PORT after boot. Loss = feature, not boot blocker. |
+| 11 | Vibrator/haptics/sensors | `mediatek,vibrator` node + `USB_TRANCEVIBRATOR=y` (`:390`) + `MTK_SENSOR_SUPPORT/SENSORHUB=y`, `evergo.dts` AW8697 pio132 | Upstream equivalents | PORT after boot. |
+| 12 | Camera sensors | `CUSTOM_KERNEL_IMGSENSOR="s5kjn1/ov50c40/ov16a1q/imx355..."` (`:120`) | Donor lists `s5kjd1/imx519/imx586/...` | PORT sensor drivers after boot. |
+| 13 | NFC/GPS/chargers | `st21nfc` i2c3, GPS ELNA gpio140/91, `MT6360_PMU/CHARGER/FLED` (`=y` vs donor `=m`), `WL2866D` | Same | PORT/adapt after boot. |
+
+### Sufficiency limits (read this before promising a boot)
+
+Manifest rows 1-9 are the complete KNOWN delta — necessary, not sufficient. These unknowns can only resolve in the Linux build→boot loop, not by more Windows reading:
+
+1. Kconfig drift: 4.14 symbols (`MACH_*`, `MTK_PLATFORM`, `GPU_VERSION` string, `ION/MTK_ION`, `PSEUDO_M4U`, `FPSGO`, `BORE/WALT`, `LTO_THIN`) may not exist in 5.10. `olddefconfig` will prompt or silently drop — review every delta, never blindly `-y`.
+2. DTS phandle drift: evergo nodes reference `mt_pmic_vcn13_ldo_reg`, pio pins, `mtkfb/dsi0/accdet`, `chosen videolfb` — some labels/phandles differ or absent in 5.10 `mt6833.dtsi` (scpsys/dvfsrc/ssmr vs mcupm/dvfsp/eem). Expect DTC errors; fix iteratively. `evergo/cust.dtsi` is external — stub it, never block on it.
+3. Panel API drift: k16a drivers call 4.14 `mtk_panel_ext` APIs missing from 5.10 slim DRM V2 — copy alone may not compile; adaptation likely.
+4. Module load order: audio/touch/GPU as `=m` must be in vendor ramdisk with correct `modules.load` order or first boot has no sound/input (still boots via ADB — keep `adb wait-for-device` path open).
+5. ROM-side coupling: `device_xiaomi_everpal` (Lineage 23.0) + vendor DLKM + sepolicy target 4.14 — a 5.10 kernel may break WiFi/BT DLKM, `modules.load`, or AVB/`vendor_boot` layout. Kernel booting ≠ ROM booting.
+6. Baseline unproven: 4.14 HEAD itself is build-broken (`r44p0` mismatch, §3.2) — fix and build 4.14 FIRST to prove the toolchain before judging 5.10 failures.
+
+Builder rule: after each failure, append the error + fix to this file's execution-order log (thinker updates the manifest; builder never silently diverges). A boot is declared only at `sys.boot_completed=1` + `dumpsys gpu 4206592/1/0` + `verifydevice.py` pass.
+
+### SKIP (decided, do not revisit without new evidence)
+
+- CSF firmware/interfaces (G57 is JM-only, `MAJOR 11` both trees).
+- `KTZ8863A` driver hunt (zero hits in both trees — backlight is `disp_pwm` + LCM bias GPIO, nothing to port).
+- `r44p0` kernel-driver chase (4.14 `everpal_defconfig:224` asks `r44p0` but only `r25p0-r32p1` vendored — that HEAD is build-broken; on 5.10 keep donor `r32p1-00bet2` + JM, userspace r49p1 ICD is decoupled and verified).
+- Copying `yunluo*`/`k6789v1_64.dts` as everpal base (MT6789/MT8781 sibling, wrong audio/panel/GPIO) — reference only.
+- `sconfig 14`, `set_sspm_big_limit_threshold`, `mtk-cl-backlight` (hardware traps, AGENTS.md).
+
+### Builder execution order (your checklist)
+
+1. §5 Phase 0 + 0b (toolchain, BUILD partition, swap).
+2. Row 9 git hygiene → Row 8 conflict cleanup → verify `git status --short` clean in new branch.
+3. Row 7 defconfig → `make O=out ARCH=arm64 everpal_5.10_defconfig` must exit 0 before any DTS work.
+4. Rows 2-4 DTS + `Makefile dtb-y` → `make ... dtbs` must produce the new `.dtb`.
+5. Rows 1+5 panels + touch → `make ... Image.gz`.
+6. Row 6 audio (`=m`) → modules build, ramdisk order check.
+7. `builder.py --vulkan --kernel out/.../Image.gz --dtbo out/.../dtbo.img` → flash → `dumpsys gpu` expect `4206592/1/0` → `verifydevice.py` → `autobench.py --cpu-only`.
+8. Rows 10-13 features. Commit per-tree with `<emoji> [TYPE]:` convention; update Geekbench compare URL across docs on any new record.
+
 ## 5. Linux Work Plan (ZorinOS/Ubuntu 22.04+)
 
 ### Phase 0 — Bootstrap (one-time)
@@ -133,6 +192,43 @@ git -C src/trees/kernel-5.10 checkout -- include/uapi/linux/netfilter net/netfil
 adb --version; python3 --version
 ```
 
+### Phase 0b — Build-host storage (ASK USER FIRST, then execute)
+
+> Fresh agent: ASK via question tool before touching disks. Settled design: pendrive = OS only, ALL builds live on a dedicated 64GB ext4 partition carved from D. Host audit below is ground truth from Windows (2026-09-21) — re-verify letters on Linux, NVMe naming differs (`nvme0n1pX`, NOT `sdX`).
+
+Host D-drive audit (Windows `Get-Volume`/`Get-Partition`/`Get-CimInstance`, read-only):
+- Host: AMD Ryzen 7 4800H 8C/16T, RAM 16557912064 bytes (~16GB) — 16GB build profile confirmed.
+- Disk 0: NVMe SAMSUNG 512GB, GPT. P1 200MB EFI, P2 16MB MSR, P3 C 129GB NTFS `AtlasOS` (73GB free), P4 902MB recovery NTFS, P5 D 381GB NTFS `Nemotron` (339GB free).
+- NO 64GB volume exists today; NO USB disk attached during audit. User's "D 64GB" = 64GB to be carved from D's free space, NOT an existing partition. NEVER format whole D.
+- CRITICAL: repo checkout lives at `D:\EverpalTweaks` — ON D ITSELF. Formatting all of D would destroy the repo + ~40GB user data. Only touch the NEW 64GB partition.
+- D is NTFS: kernel `out/` (~25-30GB) + swapfile + ccache (5-10GB) + ZyC Clang (~5GB) CANNOT live on NTFS (symlinks/x-perms/case fail). Native ext4 required.
+
+Questions to ask user on Linux:
+1. Confirm RAM (default `16GB`)? `8GB or less` (SSD swap mandatory, go 24-32GB) / `16GB` (16GB SSD swap safety net) / `32GB+` (small 8GB swap or none).
+2. Confirm the 64GB carve: `Shrink D by 64GB in Windows Disk Management first` (do this BEFORE Zorin if not done — leave as unallocated), then in Zorin format ONLY the new unallocated block as ext4 `BUILD`. If user refuses to shrink, fallback: D stays NTFS zip-drop only.
+3. Confirm mount root (default `/mnt/build`)? Only change if occupied.
+
+Key truth: the new 64GB ext4 holds the swapfile + `out/` + ccache + toolchains + optionally the repo clone. No ZRAM stage — 16GB host RAM carries the build, SSD swap is overflow insurance only. Pendrive stays lean: OS + scripts only.
+
+- Blessed path — 64GB BUILD partition (pendrive OS-only):
+```bash
+# 0. In Windows first (if not done): Disk Management → shrink D (Nemotron) by 65536 MB → leave Unallocated. Reboot into Zorin.
+lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT  # expect: nvme0n1p5 NTFS Nemotron ~355GiB, nvme0n1p6 unallocated ~64GB (new), sda/sdb = USB pendrive — NEVER wipe nvme0n1p3 (C) / p5 (D) / USB
+sudo mkfs.ext4 -L BUILD /dev/nvme0n1p6      # ONLY the NEW 64GB partition — triple-check with SIZE + no LABEL
+sudo mkdir -p /mnt/build && sudo mount /dev/disk/by-label/BUILD /mnt/build
+sudo fallocate -l 16G /mnt/build/swapfile && sudo chmod 600 /mnt/build/swapfile && sudo mkswap /mnt/build/swapfile && sudo swapon /mnt/build/swapfile
+echo -e "vm.swappiness=10\nvm.vfs_cache_pressure=75" | sudo tee /etc/sysctl.d/99-everpal-build.conf
+mkdir -p /mnt/build/{out,ccache,toolchains,work}
+# Option A (recommended): clone repo onto BUILD so EVERYTHING lives there:
+# git clone https://github.com/FrontlXOX/EverpalTweaks.git /mnt/build/EverpalTweaks  # then $REPO_ROOT=/mnt/build/EverpalTweaks
+# Option B (pendrive checkout): keep repo on USB, redirect heavy dirs to BUILD:
+ln -sfn /mnt/build/out $REPO_ROOT/src/trees/kernel/out
+export CCACHE_DIR=/mnt/build/ccache
+free -h; swapon --show; df -h /mnt/build
+```
+- Fallback only if user says D must stay NTFS untouched: D = zip-drop only. Swap + `out/`+`ccache` stay on USB persistence ext4 (tight — prune `out/` often), copy finished `*.zip` to D NTFS mount. NEVER place `out/` or `swapfile` directly on NTFS.
+- SSD wear: negligible for kernel builds. Speed win BUILD-ext4 (NVMe) vs USB stick is 3-10x on link. Per-boot on live USB: re-run `mount + swapon` (keep a `~/bin/mount-build.sh` on persistence).
+
 ### Phase 1 — Fix 4.14 baseline (proves toolchain, 30-60 min)
 1. Decide r44p0 vs r32p1: `ls src/trees/kernel/drivers/misc/mediatek/gpu/gpu_mali/mali_valhall/` — if no `mali-r44p0`, either vendor it or `git revert 91ddd80` / set `CONFIG_MTK_GPU_VERSION="mali valhall r32p1"` in `everpal_defconfig`.
 2. `bash src/scripts/build_kernel.sh --clean` (kernel-only, no --vulkan yet). Expect `out/arch/arm64/boot/Image.gz`.
@@ -145,7 +241,7 @@ git -C src/trees/kernel-5.10 checkout -b everpal-5.10 vic
 # Port from Aqua 4.14 (source of truth for board):
 git -C src/trees/kernel log --oneline -- arch/arm64/configs/everpal_defconfig arch/arm64/boot/dts/mediatek/ | head -20
 # Create arch/arm64/configs/everpal_5.10_defconfig by adapting mgk_64_k510 + everpal deltas:
-# - Keep MT6833 clocks, SND_SOC_MT6833 (donor defaults to MT6366/MT6359P — verify MT6359!), COMMON_CLK_MT6833, WALT, freezer
+# - Keep MT6833 clocks, SND_SOC_MT6833_MT6359P (donor has it as =m alongside MT6789_MT6366 — see §4b row 6 for the MT6359→MT6359P rename), COMMON_CLK_MT6833, WALT, freezer
 # - ION vs dma_heap: 5.10 deprecates /dev/ion — check CONFIG_ION in donor; if absent, migrate or carry ION shim
 # Create arch/arm64/boot/dts/mediatek/mt6833-everpal.dts from mt6833.dts + Aqua panel/touch/camera deltas + cust_mt6833_* (DO NOT copy yunluo-mt6789)
 # Verify: panel KTZ8863A 90Hz PWM 0-2047, touch, UFS2.2, MT6359 audio, wlan/bt, cam/display

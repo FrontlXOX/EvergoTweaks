@@ -6,6 +6,7 @@ build/
 *.db-wal
 scratch/
 *.db-shm
+scratch/
 .DS_Store
 *.py[cod]
 convo.txt
@@ -17,3 +18,4 @@ desktop.ini
 *.db-journal
 *logcat*.txt
 __pycache__/
+gold_images_OS3.0.10.0.VNQCNXM_15.0/

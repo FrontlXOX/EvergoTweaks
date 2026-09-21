@@ -120,7 +120,7 @@ Empirically captured on-device from `fm_local_results.db`:
 
 ## 5. Kernel Driver Architecture & Linux 4.14 vs 5.10 Backporting Guide
 
-For kernel developers (`Addster09` / `himanshuksr0007`) adapting modern Mali DDKs into the Linux 4.14 kernel tree (`android_kernel_xiaomi_mt6833`):
+For kernel developers (`Addster09` / `himanshuksr0007`) adapting modern Mali DDKs into the Linux 4.14 kernel tree ([`android_kernel_xiaomi_mt6833`](https://github.com/himanshuksr0007/android_kernel_xiaomi_mt6833)):
 
 ### A. The Mali-G57 Architecture Reality: Job Manager (JM) vs CSF
 - **Mali-G57 is Valhall v1 Architecture**.

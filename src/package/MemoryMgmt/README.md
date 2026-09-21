@@ -5,7 +5,7 @@
 > **Target Device:** Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal`)
 > **Hardware:** MediaTek Dimensity 810 (MT6833P / MT6833 family, 2x A76 @ 2.4 GHz + 6x A55 @ 2.0 GHz, Mali-G57 MC2)
 > **Kernel & OS:** Linux `4.14.357-Aqua #3` | Android 16 (Project Infinity - `BP4A.251205.006`)
-> **Target Repository:** [device_xiaomi_everpal](https://github.com/himanshuksr0007/device_xiaomi_everpal)
+> **Target Repository:** [device_xiaomi_everpal](https://github.com/FrontlXOX/device_xiaomi_everpal)
 > **Date:** September 18, 2026
 
 ---
@@ -190,7 +190,7 @@ The Xiaomi POCO M4 Pro 5G / Redmi Note 11S 5G (`everpal`) was manufactured acros
 
 ### Option A: Apply the Standalone Git Patch (Recommended)
 
-From the root of your [`device_xiaomi_everpal`](https://github.com/himanshuksr0007/device_xiaomi_everpal) repository clone:
+From the root of your [`device_xiaomi_everpal`](https://github.com/FrontlXOX/device_xiaomi_everpal) repository clone:
 
 ```bash
 git apply patch.patch

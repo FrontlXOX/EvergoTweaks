@@ -38,10 +38,10 @@ def run_git(cwd: Path, *args: str) -> tuple[int, str, str]:
         return -1, "", str(exc)
 
 
-def sync_tree(tree_dir: Path) -> bool:
+def sync_tree(tree_dir: Path, trees_dir: Path) -> bool:
     """Sync a single tree directory to GitHub fork (remote 'origin')."""
-    name = tree_dir.name
-    print(f"\n{BOLD}[*] Synchronizing: {CYAN}{name}{RESET}")
+    rel_name = str(tree_dir.relative_to(trees_dir))
+    print(f"\n{BOLD}[*] Synchronizing: {CYAN}{rel_name}{RESET}")
 
     # Check git remotes
     code, remotes, _ = run_git(tree_dir, "remote")
@@ -51,7 +51,7 @@ def sync_tree(tree_dir: Path) -> bool:
         return False
 
     # Skip read-only upstream reference mirrors
-    if name in ("upstream-device", "kernel-5.10"):
+    if rel_name in ("upstream-device", "kernel-5.10") or "kernel-5.10" in rel_name:
         print(f"    {CYAN}[*] Reference tree: Skipping push to upstream mirror{RESET}")
         return True
 
@@ -86,14 +86,18 @@ def main() -> int:
     print(f"{BOLD} EverpalTweaks Submodule Tree Synchronizer (FrontlXOX GitHub){RESET}")
     print("=" * 60)
 
-    subtrees = [d for d in trees_dir.iterdir() if d.is_dir() and (d / ".git").exists()]
+    subtrees = []
+    for git_path in trees_dir.rglob(".git"):
+        if git_path.is_file() or git_path.is_dir():
+            subtrees.append(git_path.parent)
+    subtrees = sorted(subtrees)
     if not subtrees:
         print(f"{YELLOW}[!] No git repositories found inside {trees_dir}{RESET}")
         return 1
 
     success_count = 0
     for tree in subtrees:
-        if sync_tree(tree):
+        if sync_tree(tree, trees_dir):
             success_count += 1
 
     print("\n" + "=" * 60)

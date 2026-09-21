@@ -24,8 +24,8 @@ This repository maintains four production-grade subsystems:
 
 - **Author & Maintainer:** Shovit Dutta
 - **Special Thanks & Collaborators:**
-  - **Device & Kernel Maintainer:** Addster09 ([`device_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal), [`vendor_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/vendor_xiaomi_everpal), [`android_kernel_xiaomi_mt6833`](https://github.com/Addster09/android_kernel_xiaomi_mt6833))
-  - **Android 16 Bringup & Memory Tuning:** himanshuksr0007 (Goku / Sudoku)
+  - **Android 16 Bringup & Submodule Repos:** himanshuksr0007 (Goku / Sudoku) ([`device_xiaomi_everpal`](https://github.com/himanshuksr0007/device_xiaomi_everpal), [`vendor_xiaomi_everpal`](https://github.com/himanshuksr0007/vendor_xiaomi_everpal), [`android_kernel_xiaomi_mt6833`](https://github.com/himanshuksr0007/android_kernel_xiaomi_mt6833), [`vendor_xiaomi_camera-everpal`](https://github.com/himanshuksr0007/vendor_xiaomi_camera-everpal))
+  - **Upstream Device & Kernel Maintainer:** Addster09 ([`device_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal), [`vendor_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/vendor_xiaomi_everpal), [`android_kernel_xiaomi_mt6833`](https://github.com/Addster09/android_kernel_xiaomi_mt6833))
 - **Flashable Module Author (`module.prop` metadata):** `FrontlXOX`
 
 ---
@@ -199,12 +199,20 @@ EverpalTweaks/
     │   ├── synctrees.py               # Automated tree synchronizer for GitHub (FrontlXOX)
     │   └── verifydevice.py            # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
     │
-    ├── trees/                         # 🌲 Submodule Forks on GitHub (FrontlXOX)
-    │   ├── device_xiaomi_everpal/     # FrontlXOX device tree (lineage-23.2)
-    │   ├── kernel/                    # FrontlXOX Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
-    │   ├── kernel-5.10/               # MillenniumOSS MT6789-common donor kernel (vic branch, mt6789/mt6833 sibling)
-    │   ├── upstream-device/           # xiaomi-mt6833-dev reference tree (lineage-23.2)
-    │   └── vendor_xiaomi_everpal/     # FrontlXOX vendor blobs (lineage-23.2)
+    ├── trees/                         # 🌲 Submodule Trees (himanshuksr0007 & FrontlXOX)
+    │   ├── device/
+    │   │   ├── mediatek/sepolicy_vndr/ # FrontlXOX vendor sepolicy tree (lineage-23.0)
+    │   │   └── xiaomi/everpal/         # himanshuksr0007 device tree (lineage-23.2)
+    │   ├── hardware/
+    │   │   ├── mediatek/               # FrontlXOX MTK hardware HAL (lineage-23.0)
+    │   │   └── xiaomi/                 # FrontlXOX Xiaomi hardware HAL (lineage-23.0)
+    │   ├── kernel/
+    │   │   └── xiaomi/mt6833/          # himanshuksr0007 Linux 4.14 kernel (lineage-24.0)
+    │   ├── kernel-5.10/                # MillenniumOSS MT6789-common donor kernel (vic branch)
+    │   └── vendor/
+    │       ├── mediatek/ims/           # FrontlXOX MTK IMS vendor blobs (android-16-qpr2)
+    │       ├── xiaomi/camera/          # himanshuksr0007 MIUI camera vendor blobs (lineage-23.2)
+    │       └── xiaomi/everpal/         # himanshuksr0007 vendor blobs (lineage-23.2)
     │
     ├── modules/                       # 📲 Third-Party Companion Modules (Sanctioned Rule 4 Exception)
     │   ├── *.zip                      # Curated flashable companions (numbered: MagicMountRS, ZygiskNext, ZygiskAssistant, Detach, LSPosed, ReMalwack, HideNavBar, GSFCertFix)
@@ -441,8 +449,11 @@ All agents working within this codebase must strictly observe these rules:
    - Under NO circumstances should `FrontlXOX` be listed under Authors & Credits in documentation (project authorship belongs to Shovit Dutta).
 8. 🔄 **Benchmark URL Maintenance:** Whenever a new peak record run is achieved, always update the official side-by-side comparison URL (`https://browser.geekbench.com/v7/cpu/compare/<NEW_RECORD_ID>?baseline=380539`) across all documentation markdown files (`README.md`, `AGENTS.md`, `src/package/ThermalMgmt/README.md`).
 9. 💬 **Collaborator Communications Protocol (`convo.txt`):** Whenever preparing technical information, updates, advice, or roadmaps to inform or reply to collaborators **Goku (`himanshuksr0007`)** or **Addster09**, ALWAYS create/write to a dedicated file named `convo.txt` in the repository root (`D:\EverpalTweaks\convo.txt`). The message MUST ALWAYS be **compact, concise, punchy, and strictly TO THE POINT**, using an engaging blend of technical accuracy and casual developer Telegram/chat style (e.g., emojis, bullet points, direct code/commit links, zero fluff) ready for the user to copy-paste directly to them.
-10. 🐙 **GitHub Primacy (FrontlXOX):** All project hosting, trees, forks, releases, and collaborator cherry-picks reside exclusively on **GitHub** under `https://github.com/FrontlXOX/` (`EverpalTweaks`, `device_xiaomi_everpal`, `vendor_xiaomi_everpal`, `android_kernel_xiaomi_mt6833`). GitLab has been completely deprecated per user directive.
-11. 🌲 **Submodule GitHub Tracking:** All submodules in `src/trees/` track their respective GitHub forks under `FrontlXOX` as remote `origin`. Upstream synchronization (`src/scripts/synctrees.py`) pushes directly to `origin` on GitHub.
+10. 🐙 **GitHub Primacy & Source Repos:** All project hosting, trees, and collaborator cherry-picks reside on **GitHub**:
+    - **Active Android 16 Bringup (himanshuksr0007):** [`device_xiaomi_everpal`](https://github.com/himanshuksr0007/device_xiaomi_everpal) (lineage-23.2), [`vendor_xiaomi_everpal`](https://github.com/himanshuksr0007/vendor_xiaomi_everpal) (lineage-23.2), [`android_kernel_xiaomi_mt6833`](https://github.com/himanshuksr0007/android_kernel_xiaomi_mt6833) (lineage-24.0), [`vendor_xiaomi_camera-everpal`](https://github.com/himanshuksr0007/vendor_xiaomi_camera-everpal) (lineage-23.2).
+    - **Platform & Hardware Trees (FrontlXOX):** [`EverpalTweaks`](https://github.com/FrontlXOX/EverpalTweaks), [`android_device_mediatek_sepolicy_vndr`](https://github.com/FrontlXOX/android_device_mediatek_sepolicy_vndr) (lineage-23.0), [`android_hardware_mediatek`](https://github.com/FrontlXOX/android_hardware_mediatek) (lineage-23.0), [`android_hardware_xiaomi`](https://github.com/FrontlXOX/android_hardware_xiaomi) (lineage-23.0), [`android_vendor_mediatek_ims`](https://github.com/FrontlXOX/android_vendor_mediatek_ims) (android-16-qpr2).
+    - **Donor Kernel:** [`kernel_millennium_mt6789-common`](https://github.com/MillenniumOSS/kernel_millennium_mt6789-common) (vic).
+11. 🌲 **Submodule GitHub Tracking:** All submodules in `src/trees/` track their designated GitHub repos as remote `origin`. Upstream synchronization (`src/scripts/synctrees.py`) pushes directly to `origin` on GitHub.
 12. 🤖 **Sub-Agent First Policy:** Before the parent agent makes any direct code edits, file writes, or tree modifications for non-trivial tasks, it MUST first delegate discovery, auditing, and research to specialized sub-agents. The parent agent acts as orchestrator — it reads sub-agent findings, synthesizes them, then and only then executes targeted changes. Direct parent-agent edits without prior sub-agent research are only acceptable for single-line fixes, typo corrections, or trivially scoped changes confirmed at a glance.
 
 ---

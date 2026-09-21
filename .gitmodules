@@ -1,21 +1,41 @@
-[submodule "src/trees/device_xiaomi_everpal"]
-	path = src/trees/device_xiaomi_everpal
-	url = https://github.com/FrontlXOX/device_xiaomi_everpal.git
+[submodule "src/trees/device/mediatek/sepolicy_vndr"]
+	path = src/trees/device/mediatek/sepolicy_vndr
+	url = https://github.com/FrontlXOX/android_device_mediatek_sepolicy_vndr.git
+	branch = lineage-23.0
+	ignore = dirty
+[submodule "src/trees/device/xiaomi/everpal"]
+	path = src/trees/device/xiaomi/everpal
+	url = https://github.com/himanshuksr0007/device_xiaomi_everpal.git
 	branch = lineage-23.2
 	ignore = dirty
-[submodule "src/trees/vendor_xiaomi_everpal"]
-	path = src/trees/vendor_xiaomi_everpal
-	url = https://github.com/FrontlXOX/vendor_xiaomi_everpal.git
+[submodule "src/trees/vendor/xiaomi/everpal"]
+	path = src/trees/vendor/xiaomi/everpal
+	url = https://github.com/himanshuksr0007/vendor_xiaomi_everpal.git
 	branch = lineage-23.2
 	ignore = dirty
-[submodule "src/trees/kernel"]
-	path = src/trees/kernel
-	url = https://github.com/FrontlXOX/android_kernel_xiaomi_mt6833.git
+[submodule "src/trees/kernel/xiaomi/mt6833"]
+	path = src/trees/kernel/xiaomi/mt6833
+	url = https://github.com/himanshuksr0007/android_kernel_xiaomi_mt6833.git
 	branch = lineage-24.0
 	ignore = dirty
-[submodule "src/trees/upstream-device"]
-	path = src/trees/upstream-device
-	url = https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal.git
+[submodule "src/trees/hardware/mediatek"]
+	path = src/trees/hardware/mediatek
+	url = https://github.com/FrontlXOX/android_hardware_mediatek.git
+	branch = lineage-23.0
+	ignore = dirty
+[submodule "src/trees/hardware/xiaomi"]
+	path = src/trees/hardware/xiaomi
+	url = https://github.com/FrontlXOX/android_hardware_xiaomi.git
+	branch = lineage-23.0
+	ignore = dirty
+[submodule "src/trees/vendor/mediatek/ims"]
+	path = src/trees/vendor/mediatek/ims
+	url = https://github.com/FrontlXOX/android_vendor_mediatek_ims.git
+	branch = android-16-qpr2
+	ignore = dirty
+[submodule "src/trees/vendor/xiaomi/camera"]
+	path = src/trees/vendor/xiaomi/camera
+	url = https://github.com/himanshuksr0007/vendor_xiaomi_camera-everpal.git
 	branch = lineage-23.2
 	ignore = dirty
 [submodule "src/trees/kernel-5.10"]

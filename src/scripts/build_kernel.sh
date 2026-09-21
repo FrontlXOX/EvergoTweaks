@@ -15,7 +15,11 @@ set -euo pipefail
 # ── Paths ────────────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-KERNEL_DIR="$REPO_ROOT/src/trees/kernel"
+if [ -d "$REPO_ROOT/src/trees/kernel/xiaomi/mt6833" ]; then
+    KERNEL_DIR="$REPO_ROOT/src/trees/kernel/xiaomi/mt6833"
+else
+    KERNEL_DIR="$REPO_ROOT/src/trees/kernel"
+fi
 OUT_DIR="$KERNEL_DIR/out"
 BOOT_DIR="$OUT_DIR/arch/arm64/boot"
 

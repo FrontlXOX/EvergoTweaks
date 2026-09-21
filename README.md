@@ -196,12 +196,20 @@ EverpalTweaks/
     │   ├── synctrees.py               # Submodule tree synchronizer for FrontlXOX GitHub forks
     │   └── verifydevice.py            # Live ADB hardware, Vulkan 1.3, frequency & kernel parameter audit CLI
     │
-    └── trees/                         # 🌲 Submodule Forks on GitHub (FrontlXOX)
-        ├── device_xiaomi_everpal/     # FrontlXOX device tree (lineage-23.2)
-        ├── kernel/                    # FrontlXOX Linux 4.14 kernel (lineage-24.0, vulkan-1.3)
-        ├── kernel-5.10/               # MediaTek 5.10 GKI donor kernel (vic, mt6789/mt6833 sibling)
-        ├── upstream-device/           # xiaomi-mt6833-dev reference tree (vulkan-1.3)
-        └── vendor_xiaomi_everpal/     # FrontlXOX vendor blobs (vulkan-1.3, lineage-23.2)
+    └── trees/                         # 🌲 Submodule Trees (himanshuksr0007 & FrontlXOX)
+        ├── device/
+        │   ├── mediatek/sepolicy_vndr/ # FrontlXOX vendor sepolicy tree (lineage-23.0)
+        │   └── xiaomi/everpal/         # himanshuksr0007 device tree (lineage-23.2)
+        ├── hardware/
+        │   ├── mediatek/               # FrontlXOX MTK hardware HAL (lineage-23.0)
+        │   └── xiaomi/                 # FrontlXOX Xiaomi hardware HAL (lineage-23.0)
+        ├── kernel/
+        │   └── xiaomi/mt6833/          # himanshuksr0007 Linux 4.14 kernel (lineage-24.0)
+        ├── kernel-5.10/                # MediaTek 5.10 GKI donor kernel (vic, mt6789/mt6833 sibling)
+        └── vendor/
+            ├── mediatek/ims/           # FrontlXOX MTK IMS vendor blobs (android-16-qpr2)
+            ├── xiaomi/camera/          # himanshuksr0007 MIUI camera vendor blobs (lineage-23.2)
+            └── xiaomi/everpal/         # himanshuksr0007 vendor blobs (lineage-23.2)
 ```
 
 </details>
@@ -343,5 +351,5 @@ For permanent build integration:
 
 ## 🤝 Special Thanks & Collaborators
 
-- **Addster09** — Device & Kernel Maintainer ([`device_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal), [`vendor_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/vendor_xiaomi_everpal), [`android_kernel_xiaomi_mt6833`](https://github.com/Addster09/android_kernel_xiaomi_mt6833))
-- **himanshuksr0007 (Goku)** — Android 16 Bringup & Memory Tuning Collaborator
+- **himanshuksr0007 (Goku)** — Android 16 Bringup, Submodules & Memory Tuning ([`device_xiaomi_everpal`](https://github.com/himanshuksr0007/device_xiaomi_everpal), [`vendor_xiaomi_everpal`](https://github.com/himanshuksr0007/vendor_xiaomi_everpal), [`android_kernel_xiaomi_mt6833`](https://github.com/himanshuksr0007/android_kernel_xiaomi_mt6833), [`vendor_xiaomi_camera-everpal`](https://github.com/himanshuksr0007/vendor_xiaomi_camera-everpal))
+- **Addster09** — Upstream Device & Kernel Maintainer ([`device_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal), [`vendor_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/vendor_xiaomi_everpal), [`android_kernel_xiaomi_mt6833`](https://github.com/Addster09/android_kernel_xiaomi_mt6833))

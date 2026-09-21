@@ -42,7 +42,7 @@ $REPO_ROOT/
 ├── AGENTS.md, README.md, CHANGELOG.md, LICENSE, zorin.md (this file)
 └── src/
     ├── scripts/ builder.py autobench.py benchpull.py build_kernel.sh decouple_libge2.py decrypt_thermal.py dumpboot.py synctrees.py verifydevice.py
-    ├── trees/ device_xiaomi_everpal/ kernel/ kernel-5.10/ upstream-device/ vendor_xiaomi_everpal/
+    ├── trees/ device/ hardware/ kernel/ vendor/ kernel-5.10/
     ├── modules/ *.zip companions + Kaeru/ + ResukiSU/
     └── package/
         ├── templates/ AnyKernel3/ META-INF/ SpatialAudio/ Vulkan13/
@@ -66,11 +66,11 @@ Rules: zips ONLY in `src/package/*/package/` (exception `src/modules/` companion
 - Output: `src/package/Vulkan13/package/Vulkan13-KernelSU.zip` (~90M).
 
 ### 3.2 Aqua 4.14 — BROKEN at HEAD, fix first on Linux
-- Tree: `src/trees/kernel`, remote `https://github.com/FrontlXOX/android_kernel_xiaomi_mt6833.git`, branch `lineage-24.0`, `Makefile: VERSION=4 PATCHLEVEL=14 SUBLEVEL=357 EXTRAVERSION=-Aqua`.
+- Tree: `src/trees/kernel/xiaomi/mt6833`, remote `https://github.com/himanshuksr0007/android_kernel_xiaomi_mt6833.git`, branch `lineage-24.0`, `Makefile: VERSION=4 PATCHLEVEL=14 SUBLEVEL=357 EXTRAVERSION=-Aqua`.
 - Defconfig: `arch/arm64/configs/everpal_defconfig` (487 lines): `L223 CONFIG_MTK_GPU_SUPPORT=y`, `L224 CONFIG_MTK_GPU_VERSION="mali valhall r44p0"`, `L419 CONFIG_ION=y`, `CONFIG_MACH_MT6833=y`, `CONFIG_MTK_PLATFORM="mt6853"`.
 - **Mismatch:** `drivers/misc/mediatek/gpu/gpu_mali/mali_valhall/` contains `mali-r25p0/ r27p0/ r28p0/ r30p0/ r32p0/ r32p1/` — NO `mali-r44p0/`. Kbuild chain `gpu/Makefile → gpu_mali/Makefile (valhall) → mali_valhall/Makefile (r44p0)` fails. HEAD `91ddd80 🦋 [FEAT]: update CONFIG_MTK_GPU_VERSION to mali valhall r44p0` broke build. No `drivers/gpu/arm/` (only `drm/ host1x/ ipu-v3/`).
 - Good: `platform/mt6833/{Kbuild,mali_kbase_config_mt6833.c,mali_kbase_config_platform.h}` present in r32p1, `mali_kbase_mem_linux.c` ION backend present, JM `BASE_UK_VERSION_MAJOR 11` confirmed.
-- Builder: `src/scripts/build_kernel.sh` uses `KERNEL_DIR=src/trees/kernel`, `DEFCONFIG=everpal_defconfig`, ZyC Clang 22.0.0 auto-wget to `~/toolchains/ZyC-clang-22.0.0`, `CC=clang LD=ld.lld`, `make O=out ARCH=arm64 CC="ccache clang" LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- KCFLAGS="-Wno-error=default-const-init-var-unsafe" Image.gz dtbs`. `--vulkan` calls `builder.py --vulkan --kernel out/arch/arm64/boot/Image.gz [--dtbo out/arch/arm64/boot/dtbo.img]`.
+- Builder: `src/scripts/build_kernel.sh` uses `KERNEL_DIR=src/trees/kernel/xiaomi/mt6833`, `DEFCONFIG=everpal_defconfig`, ZyC Clang 22.0.0 auto-wget to `~/toolchains/ZyC-clang-22.0.0`, `CC=clang LD=ld.lld`, `make O=out ARCH=arm64 CC="ccache clang" LLVM=1 LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- KCFLAGS="-Wno-error=default-const-init-var-unsafe" Image.gz dtbs`. `--vulkan` calls `builder.py --vulkan --kernel out/arch/arm64/boot/Image.gz [--dtbo out/arch/arm64/boot/dtbo.img]`.
 
 ### 3.3 5.10 donor — PURE DONOR, does not boot everpal
 - Path: `src/trees/kernel-5.10`, remote `https://github.com/MillenniumOSS/kernel_millennium_mt6789-common.git`, branch `vic`, `Makefile: VERSION=5 PATCHLEVEL=10 SUBLEVEL=243`, HEAD `d92da041e Merge ASB-2025-10-06_12-5.10`, shallow/grafted (1 commit), dirty 13 files (`include/uapi/linux/netfilter/*`, `net/netfilter/xt_*`, `tools/memory-model/litmus`).
@@ -95,7 +95,7 @@ ls *.md src/package/*/README.md src/package/templates/AnyKernel3/README.md
 **Step 1 — Read build infra:**
 ```bash
 cat src/scripts/build_kernel.sh
-ls src/trees/ # device_xiaomi_everpal kernel kernel-5.10 upstream-device vendor_xiaomi_everpal
+ls src/trees/ # device hardware kernel vendor kernel-5.10
 cat src/package/Vulkan13/docs/vulkan-mgmt.txt
 sed -n '1,100p' src/scripts/builder.py; grep -n "kernel\|dtbo\|blobs" src/scripts/builder.py | head -40
 ```
@@ -103,16 +103,16 @@ sed -n '1,100p' src/scripts/builder.py; grep -n "kernel\|dtbo\|blobs" src/script
 **Step 2 — Delegate audits (Sub-Agent First Policy per AGENTS.md Rule 12):**
 Parent must NOT edit before sub-agents report. Spawn 2 `explore` sub-agents:
 - Agent A prompt: "Read-only audit src/trees/kernel-5.10: README.md 100 lines, glob arch/arm64/configs/* + arch/arm64/boot/dts/mediatek/*6833* + drivers/gpu/mediatek/.../platform/mt6833*, grep BASE_UK_VERSION_MAJOR, bash read-only `git -C src/trees/kernel-5.10 remote -v; branch --show-current; log --oneline -5`, report everpal hits."
-- Agent B prompt: "Read-only audit 4.14: list src/trees/kernel top, find everpal_defconfig, report CONFIG_MTK_GPU_VERSION/CONFIG_ION/Makefile version, trace builder.py --kernel/--dtbo/--blobs injection, check drivers/gpu/arm absence + drivers/misc/mediatek/gpu/gpu_mali/mali_valhall/ versions + platform/mt6833 + mali_kbase_mem_linux.c + JM MAJOR, bash read-only `git -C src/trees/kernel remote -v; branch --show-current; log --oneline -5; ls src/package/Vulkan13/package/`."
+- Agent B prompt: "Read-only audit 4.14: list src/trees/kernel/xiaomi/mt6833 top, find everpal_defconfig, report CONFIG_MTK_GPU_VERSION/CONFIG_ION/Makefile version, trace builder.py --kernel/--dtbo/--blobs injection, check drivers/gpu/arm absence + drivers/misc/mediatek/gpu/gpu_mali/mali_valhall/ versions + platform/mt6833 + mali_kbase_mem_linux.c + JM MAJOR, bash read-only `git -C src/trees/kernel/xiaomi/mt6833 remote -v; branch --show-current; log --oneline -5; ls src/package/Vulkan13/package/`."
 - Synthesize: 5.10 = donor with mt6833 glue but no everpal board; 4.14 = r44p0 mismatch break.
 
 **Step 3 — Confirm git + outputs (read-only):**
 ```bash
-git -C src/trees/kernel remote -v; git -C src/trees/kernel branch --show-current; git -C src/trees/kernel log --oneline -5
+git -C src/trees/kernel/xiaomi/mt6833 remote -v; git -C src/trees/kernel/xiaomi/mt6833 branch --show-current; git -C src/trees/kernel/xiaomi/mt6833 log --oneline -5
 git -C src/trees/kernel-5.10 remote -v; git -C src/trees/kernel-5.10 branch --show-current; git -C src/trees/kernel-5.10 log --oneline -5
 ls -lh src/package/Vulkan13/package/
 grep -rn "BASE_UK_VERSION_MAJOR" src/trees/kernel-5.10/drivers/gpu/mediatek/gpu_mali/mali_valhall/mali-r32p1/ | head
-ls src/trees/kernel/drivers/misc/mediatek/gpu/gpu_mali/mali_valhall/
+ls src/trees/kernel/xiaomi/mt6833/drivers/misc/mediatek/gpu/gpu_mali/mali_valhall/
 ls src/package/templates/Vulkan13/
 ```
 
@@ -122,7 +122,7 @@ If all match §3, you are at the same point we were on Windows. Proceed to §5.
 
 ## 4b. 5.10 Port Manifest (Windows-verified 2026-09-21 — thinker to builder)
 
-> Builder: execute in listed order. All source paths are 4.14 Aqua (`src/trees/kernel`, submodule `FrontlXOX/android_kernel_xiaomi_mt6833`, branch `lineage-24.0`); all target paths are the NEW tree branched from 5.10 donor (`src/trees/kernel-5.10`, submodule `MillenniumOSS/kernel_millennium_mt6789-common`, branch `vic`). NEVER commit tree edits to the superproject — trees are submodules (`ignore = dirty`); new-tree work lives in its own repo/branch (`android_kernel_xiaomi_everpal-5.10`, branch `everpal-5.10`). Every row below was verified read-only on Windows — receipts included.
+> Builder: execute in listed order. All source paths are 4.14 Aqua (`src/trees/kernel/xiaomi/mt6833`, submodule `himanshuksr0007/android_kernel_xiaomi_mt6833`, branch `lineage-24.0`); all target paths are the NEW tree branched from 5.10 donor (`src/trees/kernel-5.10`, submodule `MillenniumOSS/kernel_millennium_mt6789-common`, branch `vic`). NEVER commit tree edits to the superproject — trees are submodules (`ignore = dirty`); new-tree work lives in its own repo/branch (`android_kernel_xiaomi_everpal-5.10`, branch `everpal-5.10`). Every row below was verified read-only on Windows — receipts included.
 
 ### P0 — Boot set (no boot without these)
 
@@ -222,7 +222,7 @@ mkdir -p /mnt/build/{out,ccache,toolchains,work}
 # Option A (recommended): clone repo onto BUILD so EVERYTHING lives there:
 # git clone https://github.com/FrontlXOX/EverpalTweaks.git /mnt/build/EverpalTweaks  # then $REPO_ROOT=/mnt/build/EverpalTweaks
 # Option B (pendrive checkout): keep repo on USB, redirect heavy dirs to BUILD:
-ln -sfn /mnt/build/out $REPO_ROOT/src/trees/kernel/out
+ln -sfn /mnt/build/out $REPO_ROOT/src/trees/kernel/xiaomi/mt6833/out
 export CCACHE_DIR=/mnt/build/ccache
 free -h; swapon --show; df -h /mnt/build
 ```
@@ -230,7 +230,7 @@ free -h; swapon --show; df -h /mnt/build
 - SSD wear: negligible for kernel builds. Speed win BUILD-ext4 (NVMe) vs USB stick is 3-10x on link. Per-boot on live USB: re-run `mount + swapon` (keep a `~/bin/mount-build.sh` on persistence).
 
 ### Phase 1 — Fix 4.14 baseline (proves toolchain, 30-60 min)
-1. Decide r44p0 vs r32p1: `ls src/trees/kernel/drivers/misc/mediatek/gpu/gpu_mali/mali_valhall/` — if no `mali-r44p0`, either vendor it or `git revert 91ddd80` / set `CONFIG_MTK_GPU_VERSION="mali valhall r32p1"` in `everpal_defconfig`.
+1. Decide r44p0 vs r32p1: `ls src/trees/kernel/xiaomi/mt6833/drivers/misc/mediatek/gpu/gpu_mali/mali_valhall/` — if no `mali-r44p0`, either vendor it or `git revert 91ddd80` / set `CONFIG_MTK_GPU_VERSION="mali valhall r32p1"` in `everpal_defconfig`.
 2. `bash src/scripts/build_kernel.sh --clean` (kernel-only, no --vulkan yet). Expect `out/arch/arm64/boot/Image.gz`.
 3. Only then `bash src/scripts/build_kernel.sh --vulkan` → `src/package/Vulkan13/package/Vulkan13-KernelSU.zip` + CRC verify via `builder.py --all`.
 
@@ -239,7 +239,7 @@ free -h; swapon --show; df -h /mnt/build
 # New repo under FrontlXOX, e.g. android_kernel_xiaomi_everpal-5.10, branch everpal-5.10 from vic
 git -C src/trees/kernel-5.10 checkout -b everpal-5.10 vic
 # Port from Aqua 4.14 (source of truth for board):
-git -C src/trees/kernel log --oneline -- arch/arm64/configs/everpal_defconfig arch/arm64/boot/dts/mediatek/ | head -20
+git -C src/trees/kernel/xiaomi/mt6833 log --oneline -- arch/arm64/configs/everpal_defconfig arch/arm64/boot/dts/mediatek/ | head -20
 # Create arch/arm64/configs/everpal_5.10_defconfig by adapting mgk_64_k510 + everpal deltas:
 # - Keep MT6833 clocks, SND_SOC_MT6833_MT6359P (donor has it as =m alongside MT6789_MT6366 — see §4b row 6 for the MT6359→MT6359P rename), COMMON_CLK_MT6833, WALT, freezer
 # - ION vs dma_heap: 5.10 deprecates /dev/ion — check CONFIG_ION in donor; if absent, migrate or carry ION shim

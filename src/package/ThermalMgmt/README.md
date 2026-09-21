@@ -8,9 +8,9 @@
 > **Kernel & OS:** Linux `4.14.357-Aqua #3` | Android 16 (Project Infinity - `BP4A.251205.006` / LineageOS 23.0)
 > **Target Repositories:**
 >
-> - Device: [`device_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/device_xiaomi_everpal)
-> - Vendor: [`vendor_xiaomi_everpal`](https://github.com/xiaomi-mt6833-dev/vendor_xiaomi_everpal)
-> - Kernel: [`android_kernel_xiaomi_mt6833`](https://github.com/Addster09/android_kernel_xiaomi_mt6833)
+> - Device: [`device_xiaomi_everpal`](https://github.com/himanshuksr0007/device_xiaomi_everpal)
+> - Vendor: [`vendor_xiaomi_everpal`](https://github.com/himanshuksr0007/vendor_xiaomi_everpal)
+> - Kernel: [`android_kernel_xiaomi_mt6833`](https://github.com/himanshuksr0007/android_kernel_xiaomi_mt6833)
 >   **Date:** September 18, 2026
 
 ---

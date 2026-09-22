@@ -118,6 +118,7 @@ SECONDS=0
 make -j"$(nproc)" O=out \
     ARCH=arm64 \
     CC="ccache clang" \
+    LD="ld.lld" \
     LLVM=1 \
     LLVM_IAS=1 \
     CROSS_COMPILE=aarch64-linux-gnu- \

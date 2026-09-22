@@ -89,21 +89,24 @@ KSU_FLAG_FILE="$OUT_DIR/.ksu_applied"
 [ -f "$KSU_FLAG_FILE" ] && echo "[*] KernelSU already applied — skipping patching."
 
 if [ "$INCLUDE_KSU" = true ] && [ ! -f "$KSU_FLAG_FILE" ]; then
-    echo "[*] Applying ReSukiSU + SUSFS patches ..."
-    curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/main/kernel/setup.sh" | bash
-    git clone https://github.com/JackA1ltman/NonGKI_Kernel_Build_2nd.git --depth=1 SU_patch
-    for patch in SU_patch/Patches/*sh; do
-        bash "$patch"
-    done
-    patch -p1 < SU_patch/Patches/Patch/susfs_patch_to_4.14.patch
-    wget -q https://raw.githubusercontent.com/Addster09/EverpalPatches/main/KSUPatches/defconfig-Enable-KSU-and-SUSFS.patch
-    wget -q https://raw.githubusercontent.com/Addster09/EverpalPatches/main/KSUPatches/susfs_patch_taskmmu.patch
-    patch -p1 < defconfig-Enable-KSU-and-SUSFS.patch
-    patch -p1 < susfs_patch_taskmmu.patch
-    rm -rf defconfig-Enable-KSU-and-SUSFS.patch susfs_patch_taskmmu.patch SU_patch
+    echo "[*] Applying ReSukiSU + SUSFS v2.3.0 patch ..."
+    if [ ! -d "$KERNEL_DIR/KernelSU" ]; then
+        echo "[*] Cloning ReSukiSU driver at f1dd81dc ..."
+        git clone https://github.com/ReSukiSU/ReSukiSU "$KERNEL_DIR/KernelSU"
+        git -C "$KERNEL_DIR/KernelSU" checkout f1dd81dc
+    fi
+    PATCH_FILE=""
+    if [ -f "$KERNEL_DIR/ResukiSU-SusFS.patch" ]; then
+        PATCH_FILE="$KERNEL_DIR/ResukiSU-SusFS.patch"
+    elif [ -f "$REPO_ROOT/src/modules/ResukiSU/ResukiSU-SusFS.patch" ]; then
+        PATCH_FILE="$REPO_ROOT/src/modules/ResukiSU/ResukiSU-SusFS.patch"
+    fi
+    if [ -n "$PATCH_FILE" ]; then
+        git apply "$PATCH_FILE"
+    fi
     mkdir -p "$OUT_DIR"
     touch "$KSU_FLAG_FILE"
-    echo "[+] KernelSU + SUSFS applied."
+    echo "[+] KernelSU + SUSFS v2.3.0 applied."
 fi
 
 # ── Build ─────────────────────────────────────────────────────────────────────

@@ -24,7 +24,13 @@ OUT_DIR="$KERNEL_DIR/out"
 BOOT_DIR="$OUT_DIR/arch/arm64/boot"
 
 # ── Toolchain ─────────────────────────────────────────────────────────────────
-TC_DIR="$HOME/toolchains/ZyC-clang-22.0.0"
+# Prefer the contained toolchain under build/ (see build/ layout);
+# fall back to the legacy $HOME location on machines without it.
+if [ -d "$REPO_ROOT/build/toolchains/ZyC-clang-22.0.0" ]; then
+    TC_DIR="$REPO_ROOT/build/toolchains/ZyC-clang-22.0.0"
+else
+    TC_DIR="$HOME/toolchains/ZyC-clang-22.0.0"
+fi
 TC_URL="https://github.com/ZyCromerZ/Clang/releases/download/22.0.0git-20250928-release/Clang-22.0.0git-20250928.tar.gz"
 
 # ── Build config ──────────────────────────────────────────────────────────────

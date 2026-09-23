@@ -3,5 +3,8 @@
   "flake8.enabled": false,
   "pylint.enabled": false,
   "git.ignoreLimitWarning": true,
-  "python.analysis.typeCheckingMode": "off"
+  "python.analysis.typeCheckingMode": "off",
+  "files.exclude": {
+    "**/build": false
+  }
 }

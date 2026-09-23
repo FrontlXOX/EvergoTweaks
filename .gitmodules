@@ -38,8 +38,3 @@
 	url = https://github.com/himanshuksr0007/vendor_xiaomi_camera-everpal.git
 	branch = lineage-23.2
 	ignore = dirty
-[submodule "src/trees/kernel-5.10"]
-	path = src/trees/kernel-5.10
-	url = https://github.com/MillenniumOSS/kernel_millennium_mt6789-common.git
-	branch = vic
-	ignore = dirty

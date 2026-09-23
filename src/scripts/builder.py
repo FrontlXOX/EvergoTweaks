@@ -390,6 +390,15 @@ done
 for pol in /sys/devices/system/cpu/cpufreq/policy*/schedutil/up_rate_limit_us; do
     [ -e "$pol" ] && lock_node "$pol" 0
 done
+for pol in /sys/devices/system/cpu/cpufreq/policy*/schedutil/down_rate_limit_us; do
+    [ -e "$pol" ] && lock_node "$pol" 500
+done
+for dvfsrc in /sys/devices/platform/10012000.dvfsrc/dvfsrc_force_vcore_opp \
+              /sys/devices/platform/soc/10012000.dvfsrc/dvfsrc_force_vcore_opp \
+              /proc/driver/dvfsrc/force_vcore_opp; do
+    [ -e "$dvfsrc" ] && lock_node "$dvfsrc" 0
+done
+[ -e /proc/sys/kernel/sched_migration_cost_ns ] && lock_node /proc/sys/kernel/sched_migration_cost_ns 250000
 log -t "$TAG" "Re-enforcement done."
 ) &
 

@@ -231,8 +231,8 @@ def build_thermal_module(root_dir: str) -> str:
 
         module_prop = """id=everpal-thermal-master
 name=Everpal Thermal Management & Performance Master
-version=v1
-versionCode=1
+version=v2
+versionCode=2
 author=FrontlXOX
 description=Hardware compute master for Xiaomi Everpal (Dimensity 810). Decouples thermal regulation from missing joyose, locks sconfig 10 (55°C headroom), pins CoreLink CCI at 1.6 GHz, accelerates Mali-G57 GPU DVFS to 50ms with 1068MHz boost, and unlocks full 2.4 GHz Big core capability.
 """
@@ -242,7 +242,7 @@ description=Hardware compute master for Xiaomi Everpal (Dimensity 810). Decouple
             f.write(module_prop)
 
         system_prop = """# system.prop — injected by Magisk/KernelSU at boot.
-# Everpal Thermal & Performance Master v1
+# Everpal Thermal & Performance Master v2
 
 sys.thermal.mode=10
 sys.thermal.config=thermal-nolimits.conf
@@ -262,7 +262,7 @@ debug.sf.enable_gl_backpressure=0
             f.write(system_prop)
 
         service_sh = """#!/system/bin/sh
-# service.sh — Magisk/KernelSU late-start. Hardware Compute Master v1.
+# service.sh — Magisk/KernelSU late-start. Hardware Compute Master v2.
 
 TAG="[everpal-thermal-master]"
 
@@ -286,7 +286,7 @@ lock_node() {
     fi
 }
 
-log -t "$TAG" "Applying Everpal Hardware Compute Master v1..."
+log -t "$TAG" "Applying Everpal Hardware Compute Master v2..."
 
 # 1. Thermal Governor & Sconfig 10
 setprop sys.thermal.mode 10
@@ -311,8 +311,16 @@ for cci in /sys/devices/platform/10012000.dvfsrc/dvfsrc_force_vcore_opp \\
     fi
 done
 
+# CoreLink CCI perf mode lock (blocks Power HAL downgrade to Normal)
+if [ -e /proc/cpufreq/cpufreq_cci_mode ]; then
+    lock_node /proc/cpufreq/cpufreq_cci_mode 1
+fi
+
 # 3. ARM Mali-G57 MC2 GPU Acceleration & DVFS Lock (50ms Evaluation)
+# Note: everpal uses 13000000.mali (13040000 kept as fallback for variants)
 for dvfs_p in /sys/module/pvrsrvkm/parameters/gpu_dvfs_period \\
+              /sys/devices/platform/13000000.mali/dvfs_period \\
+              /sys/devices/platform/soc/13000000.mali/dvfs_period \\
               /sys/devices/platform/13040000.mali/gpu_dvfs_period \\
               /sys/devices/platform/soc/13040000.mali/gpu_dvfs_period; do
     if [ -e "$dvfs_p" ]; then
@@ -320,7 +328,9 @@ for dvfs_p in /sys/module/pvrsrvkm/parameters/gpu_dvfs_period \\
     fi
 done
 
-for gpower in /sys/devices/platform/13040000.mali/power_policy \\
+for gpower in /sys/devices/platform/13000000.mali/power_policy \\
+              /sys/devices/platform/soc/13000000.mali/power_policy \\
+              /sys/devices/platform/13040000.mali/power_policy \\
               /sys/devices/platform/soc/13040000.mali/power_policy; do
     if [ -e "$gpower" ]; then
         write "$gpower" "always_on"
@@ -367,7 +377,23 @@ write /proc/sys/net/ipv4/tcp_keepalive_time 60
 write /proc/sys/net/ipv4/tcp_keepalive_intvl 10
 write /proc/sys/net/ipv4/tcp_keepalive_probes 5
 
-log -t "$TAG" "Everpal Hardware Compute Master v1 applied successfully."
+# 6. Background re-enforcement (late vendor Power HAL reverts CCI/DVFS/schedutil
+# after boot; re-assert once 25s later so the locks hold)
+(
+sleep 25
+log -t "$TAG" "Re-enforcing locks after late vendor init..."
+[ -e /proc/cpufreq/cpufreq_cci_mode ] && lock_node /proc/cpufreq/cpufreq_cci_mode 1
+for dvfs_p in /sys/devices/platform/13000000.mali/dvfs_period \\
+              /sys/devices/platform/soc/13000000.mali/dvfs_period; do
+    [ -e "$dvfs_p" ] && lock_node "$dvfs_p" 50
+done
+for pol in /sys/devices/system/cpu/cpufreq/policy*/schedutil/up_rate_limit_us; do
+    [ -e "$pol" ] && lock_node "$pol" 0
+done
+log -t "$TAG" "Re-enforcement done."
+) &
+
+log -t "$TAG" "Everpal Hardware Compute Master v2 applied successfully."
 """
         with open(
             os.path.join(tmp_dir, "service.sh"), "w", encoding="utf-8", newline="\n"

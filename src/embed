@@ -1,1 +1,2 @@
 gitnexus analyze --embeddings --force
+OPENCODE_SERVER_PASSWORD="kostom@767coder" opencode serve --hostname 100.73.167.95 --port 4096

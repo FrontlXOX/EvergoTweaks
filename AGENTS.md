@@ -455,6 +455,7 @@ All agents working within this codebase must strictly observe these rules:
     - **Donor Kernel:** [`kernel_millennium_mt6789-common`](https://github.com/MillenniumOSS/kernel_millennium_mt6789-common) (vic).
 11. 🌲 **Submodule GitHub Tracking:** All submodules in `src/trees/` track their designated GitHub repos as remote `origin`. Upstream synchronization (`src/scripts/synctrees.py`) pushes directly to `origin` on GitHub.
 12. 🤖 **Sub-Agent First Policy:** Before the parent agent makes any direct code edits, file writes, or tree modifications for non-trivial tasks, it MUST first delegate discovery, auditing, and research to specialized sub-agents. The parent agent acts as orchestrator — it reads sub-agent findings, synthesizes them, then and only then executes targeted changes. Direct parent-agent edits without prior sub-agent research are only acceptable for single-line fixes, typo corrections, or trivially scoped changes confirmed at a glance.
+13. 🛑 **Flashable Script Encoding Hygiene:** All shell scripts shipped inside flashable zips (`anykernel.sh`, `META-INF/com/google/android/update-binary`, `updater-script`) MUST be pure LF, ASCII, and free of BOM/garbage-byte prefixes. CRLF line endings break the recovery shebang (`#!/sbin/sh^M` → "bad interpreter" → instant sideload abort), and stray non-ASCII bytes (e.g. U+3002 `。` from a bad editor save) become fatal commands under `set -e`. Verify with `file` (must NOT say "with CRLF"), `grep -c $'\r'` (must be 0), and `sh -n` before zipping.
 
 ---
 
